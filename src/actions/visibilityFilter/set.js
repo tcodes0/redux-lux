@@ -7,9 +7,15 @@ export const initialState = {
 };
 
 export const reducer = (state = initialState, action) => {
+  if (action.type === "@@redux/INIT") {
+    return initialState;
+  }
+  if (action.type !== type) {
+    return;
+  }
   const { filter: visibilityFilter } = action.payload;
   if (!visibilityFilter) {
-    return state
+    return state;
   }
   return { visibilityFilter };
 };

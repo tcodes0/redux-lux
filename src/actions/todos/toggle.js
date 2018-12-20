@@ -7,6 +7,12 @@ export const initialState = {
 };
 
 export const reducer = (state = initialState, action) => {
+  if (action.type === "@@redux/INIT") {
+    return initialState;
+  }
+  if (action.type !== type) {
+    return;
+  }
   const { todos } = state;
   const { id } = action.payload;
 
@@ -27,5 +33,7 @@ export const reducer = (state = initialState, action) => {
   };
   return result;
 };
+
+export const reducer = () => {}
 
 export default createAction(type);
