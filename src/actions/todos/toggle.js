@@ -1,10 +1,5 @@
 import createAction from "../createAction";
 
-// export const toggleTodo = id => ({
-//   type: "TOGGLE_TODO",
-//   id
-// });
-
 export const type = "TOGGLE_TODO";
 
 export const initialState = {

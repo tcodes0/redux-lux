@@ -1,22 +1,18 @@
 import createAction from "../createAction";
 
-// export const addTodo = text => ({
-//   type,
-//   id: nextTodoId++,
-//   text
-// });
-
 export const type = "ADD_TODO";
 
 export const initialState = {
   todos: []
 };
 
+let id = 0
+
 export const reducer = (state = initialState, action) => {
-  const { id, text } = action.payload;
+  const { text } = action.payload;
 
   const todo = {
-    id,
+    id: ++id,
     text,
     completed: false
   };

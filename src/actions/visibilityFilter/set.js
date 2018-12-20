@@ -1,10 +1,5 @@
 import createAction from "../createAction";
 
-// export const setVisibilityFilter = filter => ({
-//   type: "SET_VISIBILITY_FILTER",
-//   filter
-// });
-
 export const type = "SET_VISIBILITY_FILTER";
 
 export const initialState = {
