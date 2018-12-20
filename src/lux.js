@@ -2,10 +2,10 @@ export function combineReducers(reducers) {
   return function rootReducer(state, action) {
     const nextState = Object.assign({}, state);
     // redux actions like "@@redux/INIT" don't have payload
-    const liduxAction = action.payload ? action : { ...action, payload: {} };
+    const luxAction = action.payload ? action : { ...action, payload: {} };
 
     for (const reducer of reducers) {
-      const partialState = reducer(state, liduxAction);
+      const partialState = reducer(state, luxAction);
       if (!partialState) {
         continue;
       }
