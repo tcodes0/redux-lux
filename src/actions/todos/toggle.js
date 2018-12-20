@@ -34,6 +34,4 @@ export const reducer = (state = initialState, action) => {
   return result;
 };
 
-export const reducer = () => {}
-
 export default createAction(type);
