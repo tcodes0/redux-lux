@@ -8,12 +8,15 @@ import createAction from "../createAction";
 export const type = "SET_VISIBILITY_FILTER";
 
 export const initialState = {
-  visibility: "SHOW_ALL"
+  visibilityFilter: "SHOW_ALL"
 };
 
 export const reducer = (state = initialState, action) => {
-  const { filter: visibility } = action.payload;
-  return { visibility };
+  const { filter: visibilityFilter } = action.payload;
+  if (!visibilityFilter) {
+    return state
+  }
+  return { visibilityFilter };
 };
 
 export default createAction(type);

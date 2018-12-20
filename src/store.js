@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware } from "redux";
-import combineReducers from "./lidux";
+import { combineReducers } from "./lidux";
 import logger from "redux-logger";
 import { reducer as add } from "./actions/todos/add";
 import { reducer as toggle } from "./actions/todos/toggle";

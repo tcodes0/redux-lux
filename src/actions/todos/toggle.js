@@ -7,7 +7,11 @@ import createAction from "../createAction";
 
 export const type = "TOGGLE_TODO";
 
-export const reducer = (state, action) => {
+export const initialState = {
+  todos: []
+};
+
+export const reducer = (state = initialState, action) => {
   const { todos } = state;
   const { id } = action.payload;
 
