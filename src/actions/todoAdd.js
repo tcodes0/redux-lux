@@ -1,12 +1,12 @@
-import { reducerFrom } from '../lux'
-
 let id = 0
 
-const type = 'ADD_TODO'
-const initialState = {
+export const type = 'ADD_TODO'
+
+export const initialState = {
   todos: [],
 }
-const handler = (state, payload) => {
+
+export const handler = (state, payload) => {
   const { text } = payload
 
   const todo = {
@@ -20,5 +20,3 @@ const handler = (state, payload) => {
   }
   return result
 }
-
-export const reducer = reducerFrom(type, handler, initialState)

@@ -1,10 +1,10 @@
-import { reducerFrom } from '../lux'
+export const type = 'TOGGLE_TODO'
 
-const type = 'TOGGLE_TODO'
-const initialState = {
+export const initialState = {
   todos: [],
 }
-const handler = (state, payload) => {
+
+export const handler = (state, payload) => {
   const { todos } = state
   const { id } = payload
 
@@ -25,5 +25,3 @@ const handler = (state, payload) => {
   }
   return result
 }
-
-export const reducer = reducerFrom(type, handler, initialState)

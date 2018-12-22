@@ -1,15 +1,13 @@
-import { reducerFrom } from '../lux'
+export const type = 'SET_VISIBILITY_FILTER'
 
-const type = 'SET_VISIBILITY_FILTER'
-const initialState = {
+export const initialState = {
   visibilityFilter: 'SHOW_ALL',
 }
-const handler = (state, payload) => {
+
+export const handler = (state, payload) => {
   const { filter: visibilityFilter } = payload
   if (!visibilityFilter) {
     return state
   }
   return { visibilityFilter }
 }
-
-export const reducer = reducerFrom(type, handler, initialState)
