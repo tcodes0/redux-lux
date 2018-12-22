@@ -1,5 +1,5 @@
-export const action = {}
 export const act = action
+export const action = {}
 export function makeReducer(infoObject) {
   const { type, initialState, handler } = infoObject
 
@@ -55,3 +55,5 @@ export function makeRootReducer(inputObject) {
   _rootReducer = rootReducer
   return _rootReducer
 }
+
+export default action
