@@ -1,4 +1,4 @@
-import { reducerFrom } from '../../lux'
+import { reducerFrom } from '../lux'
 
 const type = 'SET_VISIBILITY_FILTER'
 const initialState = {

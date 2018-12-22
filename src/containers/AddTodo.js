@@ -1,10 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { log, act } from '../lux'
+import { act } from '../lux'
 
 let AddTodo = ({ dispatch }) => {
   let input
-  log()
 
   return (
     <div>

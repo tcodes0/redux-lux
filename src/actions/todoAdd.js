@@ -1,4 +1,4 @@
-import { reducerFrom } from '../../lux'
+import { reducerFrom } from '../lux'
 
 let id = 0
 

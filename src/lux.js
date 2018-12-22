@@ -1,3 +1,6 @@
+export const act = {}
+export const action = act
+
 export function combineReducers(reducers) {
   return function rootReducer(state, action) {
     const nextState = Object.assign({}, state)
@@ -9,17 +12,12 @@ export function combineReducers(reducers) {
       if (!partialState) {
         continue
       }
-      console.log('new state', partialState)
+      // console.log('new state', partialState)
       Object.assign(nextState, partialState)
     }
     return nextState
   }
 }
-
-export const act = {}
-export const action = act
-
-export const log = () => console.log('act', act)
 
 export function reducerFrom(type, handler, initialState) {
   act[type] = createAction(type)
@@ -31,12 +29,8 @@ export function reducerFrom(type, handler, initialState) {
     if (action.type !== type) {
       return
     }
-    const picked = Object.keys(initialState).reduce((acc, key) => {
-      Object.assign(acc, { [key]: state[key] })
-      return acc
-    }, {})
 
-    return handler(picked, action.payload)
+    return handler(state, action.payload)
   }
 }
 
