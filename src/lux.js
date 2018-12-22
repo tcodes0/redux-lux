@@ -1,5 +1,5 @@
-export const act = action
 export const action = {}
+export const act = action
 export function makeReducer(infoObject) {
   const { type, initialState, handler } = infoObject
 
@@ -54,6 +54,39 @@ export function makeRootReducer(inputObject) {
 
   _rootReducer = rootReducer
   return _rootReducer
+}
+
+let _rootSaga
+export function makeRootSaga(inputObject) {
+  if (_rootSaga) {
+    return _rootSaga
+  }
+  const { takeEvery, all } = require('redux-saga/effects')
+  const sagas = Object.values(inputObject).map(info => {
+    const { saga, take = takeEvery, type } = info
+    if (saga) {
+      const sagaWithTake = take(type, saga)
+      return sagaWithTake
+    }
+    return undefined
+  })
+
+  function* rootSaga() {
+    yield all(sagas)
+  }
+
+  const { rootSaga: providedRootSaga } = inputObject
+  _rootSaga = providedRootSaga ? providedRootSaga(sagas) : rootSaga
+  return _rootSaga
+}
+
+export function makeRoot(inputObject) {
+  const reducer = makeRootReducer(inputObject)
+  const saga = makeRootSaga(inputObject)
+  return {
+    reducer,
+    saga,
+  }
 }
 
 export default action
