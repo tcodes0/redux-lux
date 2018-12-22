@@ -5,13 +5,11 @@ import { reducer as add } from './actions/todoAdd'
 import { reducer as toggle } from './actions/filterToggle'
 import { reducer as set } from './actions/todoSet'
 
-// prettier-ignore
-const reducers = [
+const rootReducer = combineReducers({
   add,
   toggle,
   set,
-]
-const reduxReducer = combineReducers(reducers)
-const store = createStore(reduxReducer, applyMiddleware(logger))
+})
+const store = createStore(rootReducer, applyMiddleware(logger))
 
 export default store

@@ -1,7 +1,9 @@
 export const act = {}
 export const action = act
 
-export function combineReducers(reducers) {
+export function combineReducers(reducersObject) {
+  const reducers = Object.values(reducersObject)
+
   return function rootReducer(state, action) {
     const nextState = Object.assign({}, state)
     // redux actions like "@@redux/INIT" don't have payload
