@@ -1,4 +1,4 @@
-import createAction from "../createAction";
+import { createAction } from "../../lux";
 
 export const type = "ADD_TODO";
 
