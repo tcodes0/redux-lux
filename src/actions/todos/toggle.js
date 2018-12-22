@@ -1,20 +1,12 @@
-import { createAction } from "../../lux";
+import { createAction, reducerFrom } from "../../lux";
 
-export const type = "TOGGLE_TODO";
-
-export const initialState = {
+const type = "TOGGLE_TODO";
+const initialState = {
   todos: []
 };
-
-export const reducer = (state = initialState, action) => {
-  if (action.type === "@@redux/INIT") {
-    return initialState;
-  }
-  if (action.type !== type) {
-    return;
-  }
+const handler = (state, payload) => {
   const { todos } = state;
-  const { id } = action.payload;
+  const { id } = payload;
 
   const newTodos = todos.map(todo => {
     if (todo.id !== id) {
@@ -34,4 +26,5 @@ export const reducer = (state = initialState, action) => {
   return result;
 };
 
+export const reducer = reducerFrom(type, handler, initialState);
 export default createAction(type);

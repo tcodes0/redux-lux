@@ -1,21 +1,13 @@
-import { createAction } from "../../lux";
-
-export const type = "ADD_TODO";
-
-export const initialState = {
-  todos: []
-};
+import { createAction, reducerFrom } from "../../lux";
 
 let id = 0;
 
-export const reducer = (state = initialState, action) => {
-  if (action.type === "@@redux/INIT") {
-    return initialState;
-  }
-  if (action.type !== type) {
-    return;
-  }
-  const { text } = action.payload;
+const type = "ADD_TODO";
+const initialState = {
+  todos: []
+};
+const handler = (state, payload) => {
+  const { text } = payload;
 
   const todo = {
     id: ++id,
@@ -29,4 +21,5 @@ export const reducer = (state = initialState, action) => {
   return result;
 };
 
+export const reducer = reducerFrom(type, handler, initialState);
 export default createAction(type);

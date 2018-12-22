@@ -1,10 +1,10 @@
 import { reducerFrom, createAction } from "../../lux";
 
-export const type = "SET_VISIBILITY_FILTER";
-export const initialState = {
+const type = "SET_VISIBILITY_FILTER";
+const initialState = {
   visibilityFilter: "SHOW_ALL"
 };
-export const handler = (state, payload) => {
+const handler = (state, payload) => {
   const { filter: visibilityFilter } = payload;
   if (!visibilityFilter) {
     return state;
