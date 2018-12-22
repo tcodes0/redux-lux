@@ -7,10 +7,14 @@ const Link = ({ active, children, onClick }) => {
   }
 
   return (
-    <a href="#" onClick={e => { // eslint-disable-line jsx-a11y/anchor-is-valid
-      e.preventDefault()
-      onClick()
-    }}>
+    <a
+      href="#"
+      onClick={e => {
+        // eslint-disable-line jsx-a11y/anchor-is-valid
+        e.preventDefault()
+        onClick()
+      }}
+    >
       {children}
     </a>
   )
@@ -19,7 +23,7 @@ const Link = ({ active, children, onClick }) => {
 Link.propTypes = {
   active: PropTypes.bool.isRequired,
   children: PropTypes.node.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default Link
