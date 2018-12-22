@@ -16,7 +16,14 @@ export function combineReducers(reducers) {
   }
 }
 
+export const act = {}
+export const action = act
+
+export const log = () => console.log('act', act)
+
 export function reducerFrom(type, handler, initialState) {
+  act[type] = createAction(type)
+
   return function reducer(state = initialState, action) {
     if (action.type === '@@redux/INIT') {
       return initialState

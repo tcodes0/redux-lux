@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import addTodo from '../actions/todos/add'
+import { log, act } from '../lux'
 
 let AddTodo = ({ dispatch }) => {
   let input
+  log()
 
   return (
     <div>
@@ -13,7 +14,7 @@ let AddTodo = ({ dispatch }) => {
           if (!input.value.trim()) {
             return
           }
-          dispatch(addTodo({ text: input.value }))
+          dispatch(act.ADD_TODO({ text: input.value }))
           input.value = ''
         }}
       >

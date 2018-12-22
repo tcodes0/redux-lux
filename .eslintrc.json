@@ -24,7 +24,6 @@
   ],
   "rules": {
     "node/no-unsupported-features": "off",
-    "no-undef": "off",
     "no-unused-vars": "off",
     "no-console": "off",
     "arrow-body-style": "off",

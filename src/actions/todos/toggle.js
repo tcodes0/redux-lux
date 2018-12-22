@@ -1,4 +1,4 @@
-import { createAction, reducerFrom } from '../../lux'
+import { reducerFrom } from '../../lux'
 
 const type = 'TOGGLE_TODO'
 const initialState = {
@@ -27,4 +27,3 @@ const handler = (state, payload) => {
 }
 
 export const reducer = reducerFrom(type, handler, initialState)
-export default createAction(type)

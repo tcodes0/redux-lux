@@ -1,4 +1,4 @@
-import { reducerFrom, createAction } from '../../lux'
+import { reducerFrom } from '../../lux'
 
 const type = 'SET_VISIBILITY_FILTER'
 const initialState = {
@@ -13,4 +13,3 @@ const handler = (state, payload) => {
 }
 
 export const reducer = reducerFrom(type, handler, initialState)
-export default createAction(type)

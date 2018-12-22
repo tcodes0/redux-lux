@@ -1,4 +1,4 @@
-import { createAction, reducerFrom } from '../../lux'
+import { reducerFrom } from '../../lux'
 
 let id = 0
 
@@ -22,4 +22,3 @@ const handler = (state, payload) => {
 }
 
 export const reducer = reducerFrom(type, handler, initialState)
-export default createAction(type)
