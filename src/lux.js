@@ -51,10 +51,13 @@ export function makeRootReducer(inputObject) {
 
   function rootReducer(state, action) {
     const nextState = Object.assign({}, state)
+    const { rootReducer: providedRootReducer, ...rest } = inputObject
+    const stateFromReducer =
+      providedRootReducer && providedRootReducer(nextState, action)
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    for (const info of Object.values(inputObject)) {
+    for (const info of Object.values(rest)) {
       const reducer = makeReducer(info)
       const partialState = reducer(state, luxAction)
       if (!partialState) {
@@ -75,8 +78,9 @@ export function makeRootSaga(inputObject) {
   if (_rootSaga) {
     return _rootSaga
   }
+  const { rootSaga: providedRootSaga, ...rest } = inputObject
   const { takeEvery, all } = require('redux-saga/effects')
-  const sagas = Object.values(inputObject).map(info => {
+  const sagas = Object.values(rest).map(info => {
     const { saga, take = takeEvery, type } = info
     if (saga) {
       const sagaWithTake = take(type, saga)
@@ -89,7 +93,6 @@ export function makeRootSaga(inputObject) {
     yield all(sagas)
   }
 
-  const { rootSaga: providedRootSaga } = inputObject
   _rootSaga = providedRootSaga ? providedRootSaga(sagas) : rootSaga
   return _rootSaga
 }
