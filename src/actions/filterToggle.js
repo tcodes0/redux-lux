@@ -1,8 +1,8 @@
 export const type = 'TOGGLE_TODO'
 
-export const initialState = {
-  todos: [],
-}
+export const initialState = []
+
+export const slice = 'todos'
 
 export const reducer = (state, payload) => {
   const { todos } = state

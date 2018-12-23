@@ -4,16 +4,21 @@ export const act = action
 
 const _reducers = {}
 export function makeReducer(exportedInfo) {
-  const { type, initialState, reducer } = exportedInfo
+  const { type, initialState, reducer, slice } = exportedInfo
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
   }
 
+  let slicedState = slice ? {} : initialState
+  if (slice) {
+    slicedState[slice] = initialState
+  }
+
   action[type] = createAction(type)
-  function luxReducer(state = initialState, action) {
+  function luxReducer(state = slicedState, action) {
     if (action.type === '@@redux/INIT') {
-      return initialState
+      return slicedState
     }
     if (action.type !== type) {
       return

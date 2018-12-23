@@ -5,9 +5,9 @@ let id = 0
 
 export const type = 'ADD_TODO'
 
-export const initialState = {
-  todos: [],
-}
+export const initialState = []
+
+export const slice = 'todos'
 
 export const reducer = (state, payload) => {
   const { text } = payload
