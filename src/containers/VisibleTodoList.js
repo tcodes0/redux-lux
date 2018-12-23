@@ -23,7 +23,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  onTodoClick: id => act.TOGGLE_TODO({ id }),
+  onTodoClick: id => act.TOGGLE_TODO(id),
 }
 
 const VisibleTodoList = connect(

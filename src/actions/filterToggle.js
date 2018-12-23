@@ -6,10 +6,9 @@ export const slice = 'todos'
 
 export const reducer = (state, payload) => {
   const { todos } = state
-  const { id } = payload
 
   const newTodos = todos.map(todo => {
-    if (todo.id !== id) {
+    if (todo.id !== payload) {
       return todo
     }
     const completed = !todo.completed

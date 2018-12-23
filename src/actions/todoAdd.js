@@ -10,11 +10,9 @@ export const initialState = []
 export const slice = 'todos'
 
 export const reducer = (state, payload) => {
-  const { text } = payload
-
   const todo = {
     id: ++id,
-    text,
+    text: payload,
     completed: false,
   }
   const todos = [...state.todos, todo]
