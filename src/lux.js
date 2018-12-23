@@ -9,14 +9,14 @@ export function makeReducer(exportedInfo) {
     return _reducer
   }
 
-  let slicedState = slice ? {} : initialState
+  const slicedState = slice ? {} : initialState
   if (slice) {
     slicedState[slice] = initialState
   }
 
   action[type] = createAction(type)
   function luxReducer(state = slicedState, action) {
-    if (action.type === '@@redux/INIT') {
+    if (/^@@redux[/]INIT/.test(action.type)) {
       return slicedState
     }
     if (action.type !== type) {
@@ -52,8 +52,9 @@ export function makeRootReducer(inputObject) {
   function rootReducer(state, action) {
     const nextState = Object.assign({}, state)
     const { rootReducer: providedRootReducer, ...rest } = inputObject
-    const stateFromReducer =
-      providedRootReducer && providedRootReducer(nextState, action)
+    const stateFromReducer = providedRootReducer
+      ? providedRootReducer(nextState, action)
+      : nextState
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
@@ -64,9 +65,9 @@ export function makeRootReducer(inputObject) {
         continue
       }
       // console.log('new state', partialState)
-      Object.assign(nextState, partialState)
+      Object.assign(stateFromReducer, partialState)
     }
-    return nextState
+    return stateFromReducer
   }
 
   _rootReducer = rootReducer
