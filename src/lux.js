@@ -1,29 +1,49 @@
 const action = {}
 export default action
+let _isFirstAction = true
 
 const _reducers = {}
 export function makeReducer(exportedInfo) {
-  const { type, initialState, reducer, slice } = exportedInfo
+  const { type, initialState, reducer, slices } = exportedInfo
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
   }
 
-  const slicedState = slice ? {} : initialState
-  if (slice) {
-    slicedState[slice] = initialState
+  const slicedState = slices ? {} : initialState
+  if (slices) {
+    for (const slice of slices) {
+      slicedState[slice] = initialState
+    }
   }
-
   action[type] = createAction(type)
+
   function luxReducer(state = slicedState, action) {
-    if (/^@@redux[/]INIT/.test(action.type)) {
+    if (_isFirstAction && /^@@redux[/]INIT/.test(action.type)) {
+      _isFirstAction = false
       return slicedState
     }
     if (action.type !== type) {
       return
     }
 
-    return reducer(state, action.payload)
+    const scopedState = slices
+      ? slices.reduce((acc, slice) => {
+          acc[slice] = state[slice]
+          return acc
+        }, {})
+      : state
+
+    const result = reducer(scopedState, action.payload)
+
+    if (slices) {
+      const newSlices = slices.reduce((acc, slice) => {
+        acc[slice] = { ...state[slice], ...result[slice] }
+        return acc
+      }, {})
+      return newSlices
+    }
+    return result
   }
 
   _reducers[type] = luxReducer
@@ -55,6 +75,7 @@ export function makeRootReducer(inputObject) {
     const stateFromReducer = providedRootReducer
       ? providedRootReducer(nextState, action)
       : nextState
+    // console.log('statefrom', stateFromReducer)
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
