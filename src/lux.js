@@ -1,6 +1,5 @@
-export const action = {}
+const action = {}
 export default action
-export const act = action
 
 const _reducers = {}
 export function makeReducer(exportedInfo) {
