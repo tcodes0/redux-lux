@@ -9,7 +9,7 @@ export const initialState = {
   todos: [],
 }
 
-export const handler = (state, payload) => {
+export const reducer = (state, payload) => {
   const { text } = payload
 
   const todo = {

@@ -4,7 +4,7 @@ export const initialState = {
   todos: [],
 }
 
-export const handler = (state, payload) => {
+export const reducer = (state, payload) => {
   const { todos } = state
   const { id } = payload
 

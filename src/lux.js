@@ -1,10 +1,17 @@
 export const action = {}
+export default action
 export const act = action
-export function makeReducer(infoObject) {
-  const { type, initialState, handler } = infoObject
+
+const _reducers = {}
+export function makeReducer(exportedInfo) {
+  const { type, initialState, reducer } = exportedInfo
+  const _reducer = _reducers[type]
+  if (_reducer) {
+    return _reducer
+  }
 
   action[type] = createAction(type)
-  return function reducer(state = initialState, action) {
+  function luxReducer(state = initialState, action) {
     if (action.type === '@@redux/INIT') {
       return initialState
     }
@@ -12,8 +19,11 @@ export function makeReducer(infoObject) {
       return
     }
 
-    return handler(state, action.payload)
+    return reducer(state, action.payload)
   }
+
+  _reducers[type] = luxReducer
+  return luxReducer
 }
 
 export function createAction(type) {
@@ -88,5 +98,3 @@ export function makeRoot(inputObject) {
     saga,
   }
 }
-
-export default action

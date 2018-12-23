@@ -4,7 +4,7 @@ export const initialState = {
   visibilityFilter: 'SHOW_ALL',
 }
 
-export const handler = (state, payload) => {
+export const reducer = (state, payload) => {
   const { filter: visibilityFilter } = payload
   if (!visibilityFilter) {
     return state
