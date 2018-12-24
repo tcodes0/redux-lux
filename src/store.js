@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
-import { makeRoot } from './lux'
+import { init } from './lux'
 import logger from 'redux-logger'
 import * as add from './actions/todoAdd'
 import * as toggle from './actions/filterToggle'
@@ -12,13 +12,13 @@ const rootReducer = (state, action) => {
 }
 
 const sagaMiddleware = createSagaMiddleware()
-const { reducer, saga } = makeRoot({
+const { rootReducer: reducer, rootSaga } = init({
   add,
   toggle,
   set,
   rootReducer,
 })
 const store = createStore(reducer, applyMiddleware(logger, sagaMiddleware))
-sagaMiddleware.run(saga)
+sagaMiddleware.run(rootSaga)
 
 export default store

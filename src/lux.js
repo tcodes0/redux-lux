@@ -106,11 +106,11 @@ export function makeRootSaga(inputObject) {
   return _rootSaga
 }
 
-export function makeRoot(inputObject) {
-  const reducer = makeRootReducer(inputObject)
-  const saga = makeRootSaga(inputObject)
+export function init(inputObject) {
+  const rootReducer = makeRootReducer(inputObject)
+  const rootSaga = makeRootSaga(inputObject)
   return {
-    reducer,
-    saga,
+    rootReducer,
+    rootSaga,
   }
 }
