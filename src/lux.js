@@ -1,49 +1,36 @@
-const action = {}
-export default action
+const _actions = {}
+export default _actions
 let _isFirstAction = true
 
 const _reducers = {}
 export function makeReducer(exportedInfo) {
-  const { type, initialState, reducer, slices } = exportedInfo
+  const { type, initialState, reducers } = exportedInfo
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
   }
 
-  const slicedState = slices ? {} : initialState
-  if (slices) {
-    for (const slice of slices) {
-      slicedState[slice] = initialState
-    }
-  }
-  action[type] = createAction(type)
+  _actions[type] = createAction(type)
 
-  function luxReducer(state = slicedState, action) {
+  function luxReducer(state = initialState, action) {
     if (_isFirstAction && /^@@redux[/]INIT/.test(action.type)) {
       _isFirstAction = false
-      return slicedState
+      return initialState
     }
     if (action.type !== type) {
       return
     }
 
-    const scopedState = slices
-      ? slices.reduce((acc, slice) => {
-          acc[slice] = state[slice]
-          return acc
-        }, {})
-      : state
-
-    const result = reducer(scopedState, action.payload)
-
-    if (slices) {
-      const newSlices = slices.reduce((acc, slice) => {
-        acc[slice] = { ...state[slice], ...result[slice] }
-        return acc
-      }, {})
-      return newSlices
+    let newState = {}
+    for (const [slice, reducer] of Object.entries(reducers)) {
+      const result = reducer(state[slice], action.payload)
+      if (!result) {
+        continue
+      }
+      newState = { ...newState, [slice]: { ...state[slice], ...result } }
     }
-    return result
+
+    return newState
   }
 
   _reducers[type] = luxReducer
@@ -81,11 +68,11 @@ export function makeRootReducer(inputObject) {
 
     for (const info of Object.values(rest)) {
       const reducer = makeReducer(info)
-      const partialState = reducer(state, luxAction)
+      const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
         continue
       }
-      // console.log('new state', partialState)
+      console.log('new state', partialState)
       Object.assign(stateFromReducer, partialState)
     }
     return stateFromReducer
