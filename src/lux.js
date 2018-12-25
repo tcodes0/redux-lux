@@ -1,22 +1,19 @@
 const _actions = {}
+_actions.type = {}
 export default _actions
-// let _returnedInitial = false
 
 const _reducers = {}
-export function makeReducer(actionModel) {
-  const { type, reducers } = actionModel
+export function makeReducer(info) {
+  const { type, reducers } = info
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
   }
 
   _actions[type] = createAction(type)
+  _actions.type[type] = type
 
   function luxReducer(state, action) {
-    // if (!_returnedInitial && /^@@redux[/]INIT/.test(action.type)) {
-    //   _returnedInitial = true
-    //   return initialState
-    // }
     if (action.type !== type) {
       return
     }
@@ -27,7 +24,7 @@ export function makeReducer(actionModel) {
       if (!result) {
         continue
       }
-      newState = { ...newState, [slice]: { ...state[slice], ...result } }
+      newState = { ...newState, [slice]: result }
     }
 
     return newState
@@ -58,7 +55,7 @@ export function makeRootReducer(inputObject) {
   const {
     rootReducer: providedRootReducer,
     initialState,
-    ...actionModels
+    ...actionInfos
   } = inputObject
 
   function rootReducer(state = initialState, action) {
@@ -70,7 +67,7 @@ export function makeRootReducer(inputObject) {
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    for (const info of Object.values(actionModels)) {
+    for (const info of Object.values(actionInfos)) {
       const reducer = makeReducer(info)
       const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
