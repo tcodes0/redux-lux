@@ -13,7 +13,8 @@ const initialState = {
 }
 
 const sagaMiddleware = createSagaMiddleware()
-const { rootReducer: reducer, rootSaga } = init({
+const { luxReducer, luxSaga } = init({
+  preferPayload: true,
   initialState,
   add,
   toggle,
@@ -21,9 +22,9 @@ const { rootReducer: reducer, rootSaga } = init({
 })
 const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 const store = createStore(
-  reducer,
+  luxReducer,
   comp(applyMiddleware(logger, sagaMiddleware)),
 )
-sagaMiddleware.run(rootSaga)
+sagaMiddleware.run(luxSaga)
 
 export default store

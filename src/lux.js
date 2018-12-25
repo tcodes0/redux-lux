@@ -4,7 +4,7 @@ export default _actions
 
 const _reducers = {}
 export function makeReducer(info) {
-  const { type, reducers } = info
+  const { type, reducers, preferPayload } = info
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
@@ -20,7 +20,10 @@ export function makeReducer(info) {
 
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
-      const result = reducer(state[slice], action.payload)
+      const result = reducer(
+        state[slice],
+        preferPayload ? action.payload : action,
+      )
       if (!result) {
         continue
       }
@@ -55,6 +58,7 @@ export function makeRootReducer(inputObject) {
   const {
     rootReducer: providedRootReducer,
     initialState,
+    preferPayload,
     ...actionInfos
   } = inputObject
 
@@ -63,12 +67,12 @@ export function makeRootReducer(inputObject) {
     const stateFromReducer = providedRootReducer
       ? providedRootReducer(nextState, action)
       : nextState
-    // console.log('statefrom', stateFromReducer)
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
     for (const info of Object.values(actionInfos)) {
-      const reducer = makeReducer(info)
+      const finalInfo = preferPayload ? { ...info, preferPayload } : info
+      const reducer = makeReducer(finalInfo)
       const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
         continue
@@ -88,30 +92,33 @@ export function makeRootSaga(inputObject) {
   if (_rootSaga) {
     return _rootSaga
   }
-  const { rootSaga: providedRootSaga, ...rest } = inputObject
+  const { preferPayload, ...actionInfos } = inputObject
+
   const { takeEvery, all } = require('redux-saga/effects')
-  const sagas = Object.values(rest).map(info => {
-    const { saga, take = takeEvery, type } = info
+  const sagas = Object.values(actionInfos).map(info => {
+    const finalInfo = preferPayload ? { ...info, preferPayload } : info
+    const { saga, take = takeEvery, type, preferPayload } = finalInfo
     if (saga) {
-      const sagaWithTake = take(type, saga)
+      const sagaWithPayload = action => saga(action.payload)
+      const sagaWithTake = take(type, preferPayload ? sagaWithPayload : saga)
       return sagaWithTake
     }
     return undefined
   })
 
-  function* rootSaga() {
+  function* defaultRootSaga() {
     yield all(sagas)
   }
 
-  _rootSaga = providedRootSaga ? providedRootSaga(sagas) : rootSaga
+  _rootSaga = defaultRootSaga
   return _rootSaga
 }
 
 export function init(inputObject) {
-  const rootReducer = makeRootReducer(inputObject)
-  const rootSaga = makeRootSaga(inputObject)
+  const luxReducer = makeRootReducer(inputObject)
+  const luxSaga = makeRootSaga(inputObject)
   return {
-    rootReducer,
-    rootSaga,
+    luxReducer,
+    luxSaga,
   }
 }
