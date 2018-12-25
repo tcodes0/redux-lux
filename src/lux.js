@@ -51,7 +51,7 @@ export function createAction(type) {
 }
 
 let _rootReducer
-export function makeRootReducer(inputObject) {
+export function makeLuxReducer(inputObject) {
   if (_rootReducer) {
     return _rootReducer
   }
@@ -87,36 +87,39 @@ export function makeRootReducer(inputObject) {
   return _rootReducer
 }
 
-let _rootSaga
-export function makeRootSaga(inputObject) {
-  if (_rootSaga) {
-    return _rootSaga
+let _luxSaga
+export function makeLuxSaga(inputObject) {
+  if (_luxSaga) {
+    return _luxSaga
   }
-  const { preferPayload, models } = inputObject
-
+  const { preferPayload, models, luxSagaImplementation } = inputObject
   const { takeEvery, all } = require('redux-saga/effects')
-  const sagas = models.map(model => {
+
+  let sagas = []
+  for (const model of models) {
     const finalModel = preferPayload ? { ...model, preferPayload } : model
     const { saga, take = takeEvery, type, preferPayload } = finalModel
-    if (saga) {
-      const sagaWithPayload = action => saga(action.payload)
-      const sagaWithTake = take(type, preferPayload ? sagaWithPayload : saga)
-      return sagaWithTake
+    if (!saga) {
+      continue
     }
-    return undefined
-  })
+    const sagaWithPayload = action => saga(action.payload)
+    const sagaWithTake = take(type, preferPayload ? sagaWithPayload : saga)
+    sagas.push(sagaWithTake)
+  }
 
-  function* defaultRootSaga() {
+  function* defaultLuxSaga() {
     yield all(sagas)
   }
 
-  _rootSaga = defaultRootSaga
-  return _rootSaga
+  _luxSaga = luxSagaImplementation
+    ? luxSagaImplementation(sagas)
+    : defaultLuxSaga
+  return _luxSaga
 }
 
 export function init(inputObject) {
-  const luxReducer = makeRootReducer(inputObject)
-  const luxSaga = makeRootSaga(inputObject)
+  const luxReducer = makeLuxReducer(inputObject)
+  const luxSaga = makeLuxSaga(inputObject)
   return {
     luxReducer,
     luxSaga,
