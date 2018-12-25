@@ -93,8 +93,19 @@ export function makeLuxSaga(inputObject) {
   if (_luxSaga) {
     return _luxSaga
   }
-  const { preferPayload, models, luxSagaImplementation } = inputObject
-  const { takeEvery, all } = require('redux-saga/effects')
+  const {
+    preferPayload,
+    models,
+    luxSagaImplementation,
+    takeEvery,
+    all,
+  } = inputObject
+
+  if (!takeEvery || !all) {
+    throw new Error(
+      'To use makeLuxSaga or init you need to provide "takeEvery" and "all" in the argument object. Both are exported from redux-saga/effects.',
+    )
+  }
 
   let sagas = []
   for (const model of models) {

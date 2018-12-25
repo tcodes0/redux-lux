@@ -1,6 +1,7 @@
 /* global window */
 import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
+import { takeEvery, all } from 'redux-saga/effects'
 import { init } from './lux'
 import logger from 'redux-logger'
 import * as add from './actions/todoAdd'
@@ -17,6 +18,8 @@ const { luxReducer, luxSaga } = init({
   // createAction
   // luxSagaImplementation
   // rootReducer,
+  takeEvery,
+  all,
   preferPayload: true,
   initialState,
   // prettier-ignore
