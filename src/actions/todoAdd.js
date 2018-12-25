@@ -5,21 +5,16 @@ let id = 0
 
 export const type = 'ADD_TODO'
 
-export const initialState = []
-
-export const slice = 'todos'
-
-export const reducer = (state, payload) => {
-  const todo = {
-    id: ++id,
-    text: payload,
-    completed: false,
-  }
-  const todos = [...state.todos, todo]
-  const result = {
-    todos,
-  }
-  return result
+export const reducers = {
+  todos: (state, payload) => {
+    const todo = {
+      id: ++id,
+      text: payload,
+      completed: false,
+    }
+    const todos = [...state, todo]
+    return todos
+  },
 }
 
 export function* saga() {

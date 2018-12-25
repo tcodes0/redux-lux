@@ -7,17 +7,17 @@ import * as add from './actions/todoAdd'
 import * as toggle from './actions/filterToggle'
 import * as set from './actions/todoSet'
 
-const rootReducer = (state, action) => {
-  console.log(state, action)
-  return state
+const initialState = {
+  todos: [],
+  visibilityFilter: 'SHOW_ALL',
 }
 
 const sagaMiddleware = createSagaMiddleware()
 const { rootReducer: reducer, rootSaga } = init({
+  initialState,
   add,
   toggle,
   set,
-  rootReducer,
 })
 const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 const store = createStore(
