@@ -1,5 +1,6 @@
-const _actions = {}
-_actions.type = {}
+const _action = {}
+const _type = {}
+export const type = _type
 
 export function makeLuxAction(type) {
   return function actionCreator(payload) {
@@ -23,8 +24,8 @@ export function makeModelReducer(info) {
   }
 
   const actionCreator = createAction || makeLuxAction
-  _actions[type] = actionCreator(type)
-  _actions.type[type] = type
+  _action[type] = actionCreator(type)
+  _type[type] = type
 
   function luxReducer(state, action) {
     if (action.type !== type) {
@@ -103,7 +104,7 @@ export function makeLuxSaga(inputObject) {
 
   if (!takeEvery || !all) {
     throw new Error(
-      'To use makeLuxSaga or init you need to provide "takeEvery" and "all" in the argument object. Both are exported from redux-saga/effects.',
+      'Lux: To use makeLuxSaga or init you need to provide "takeEvery" and "all" in the argument object. Both are exported from redux-saga/effects.',
     )
   }
 
@@ -138,4 +139,4 @@ export function init(inputObject) {
   }
 }
 
-export default _actions
+export default _action
