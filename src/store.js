@@ -16,9 +16,12 @@ const sagaMiddleware = createSagaMiddleware()
 const { luxReducer, luxSaga } = init({
   preferPayload: true,
   initialState,
-  add,
-  toggle,
-  set,
+  // prettier-ignore
+  models: [
+    add,
+    toggle,
+    set,
+  ]
 })
 const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 const store = createStore(

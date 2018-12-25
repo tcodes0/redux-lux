@@ -59,7 +59,7 @@ export function makeRootReducer(inputObject) {
     rootReducer: providedRootReducer,
     initialState,
     preferPayload,
-    ...actionInfos
+    models,
   } = inputObject
 
   function rootReducer(state = initialState, action) {
@@ -70,9 +70,9 @@ export function makeRootReducer(inputObject) {
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    for (const info of Object.values(actionInfos)) {
-      const finalInfo = preferPayload ? { ...info, preferPayload } : info
-      const reducer = makeReducer(finalInfo)
+    for (const model of models) {
+      const finalModel = preferPayload ? { ...model, preferPayload } : model
+      const reducer = makeReducer(finalModel)
       const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
         continue
@@ -92,12 +92,12 @@ export function makeRootSaga(inputObject) {
   if (_rootSaga) {
     return _rootSaga
   }
-  const { preferPayload, ...actionInfos } = inputObject
+  const { preferPayload, models } = inputObject
 
   const { takeEvery, all } = require('redux-saga/effects')
-  const sagas = Object.values(actionInfos).map(info => {
-    const finalInfo = preferPayload ? { ...info, preferPayload } : info
-    const { saga, take = takeEvery, type, preferPayload } = finalInfo
+  const sagas = models.map(model => {
+    const finalModel = preferPayload ? { ...model, preferPayload } : model
+    const { saga, take = takeEvery, type, preferPayload } = finalModel
     if (saga) {
       const sagaWithPayload = action => saga(action.payload)
       const sagaWithTake = take(type, preferPayload ? sagaWithPayload : saga)
