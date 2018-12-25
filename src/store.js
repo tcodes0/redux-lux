@@ -14,6 +14,9 @@ const initialState = {
 
 const sagaMiddleware = createSagaMiddleware()
 const { luxReducer, luxSaga } = init({
+  // createAction
+  // luxSagaImplementation
+  // rootReducer,
   preferPayload: true,
   initialState,
   // prettier-ignore

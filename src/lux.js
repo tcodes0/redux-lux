@@ -1,16 +1,29 @@
 const _actions = {}
 _actions.type = {}
-export default _actions
+
+export function makeLuxAction(type) {
+  return function actionCreator(payload) {
+    if (!payload) {
+      payload = {}
+    }
+    const result = {
+      type,
+      payload,
+    }
+    return result
+  }
+}
 
 const _reducers = {}
-export function makeReducer(info) {
-  const { type, reducers, preferPayload } = info
+export function makeModelReducer(info) {
+  const { type, reducers, preferPayload, createAction } = info
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
   }
 
-  _actions[type] = createAction(type)
+  const actionCreator = createAction || makeLuxAction
+  _actions[type] = actionCreator(type)
   _actions.type[type] = type
 
   function luxReducer(state, action) {
@@ -37,42 +50,30 @@ export function makeReducer(info) {
   return luxReducer
 }
 
-export function createAction(type) {
-  return function actionCreator(payload) {
-    if (!payload) {
-      payload = {}
-    }
-    const result = {
-      type,
-      payload,
-    }
-    return result
-  }
-}
-
-let _rootReducer
+let _luxReducer
 export function makeLuxReducer(inputObject) {
-  if (_rootReducer) {
-    return _rootReducer
+  if (_luxReducer) {
+    return _luxReducer
   }
   const {
-    rootReducer: providedRootReducer,
+    rootReducer,
     initialState,
     preferPayload,
+    createAction,
     models,
   } = inputObject
 
-  function rootReducer(state = initialState, action) {
+  function luxReducer(state = initialState, action) {
     const nextState = Object.assign({}, state)
-    const stateFromReducer = providedRootReducer
-      ? providedRootReducer(nextState, action)
+    const stateFromReducer = rootReducer
+      ? rootReducer(nextState, action)
       : nextState
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
     for (const model of models) {
       const finalModel = preferPayload ? { ...model, preferPayload } : model
-      const reducer = makeReducer(finalModel)
+      const reducer = makeModelReducer({ ...finalModel, createAction })
       const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
         continue
@@ -83,8 +84,8 @@ export function makeLuxReducer(inputObject) {
     return stateFromReducer
   }
 
-  _rootReducer = rootReducer
-  return _rootReducer
+  _luxReducer = luxReducer
+  return _luxReducer
 }
 
 let _luxSaga
@@ -125,3 +126,5 @@ export function init(inputObject) {
     luxSaga,
   }
 }
+
+export default _actions
