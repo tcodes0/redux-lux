@@ -1,4 +1,5 @@
-import { createStore, applyMiddleware } from 'redux'
+/* global window */
+import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import { init } from './lux'
 import logger from 'redux-logger'
@@ -18,7 +19,11 @@ const { rootReducer: reducer, rootSaga } = init({
   set,
   rootReducer,
 })
-const store = createStore(reducer, applyMiddleware(logger, sagaMiddleware))
+const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(
+  reducer,
+  comp(applyMiddleware(logger, sagaMiddleware)),
+)
 sagaMiddleware.run(rootSaga)
 
 export default store

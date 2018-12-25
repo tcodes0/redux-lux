@@ -1,10 +1,10 @@
 const _actions = {}
 export default _actions
-let _isFirstAction = true
+// let _returnedInitial = false
 
 const _reducers = {}
-export function makeReducer(exportedInfo) {
-  const { type, initialState, reducers } = exportedInfo
+export function makeReducer(actionModel) {
+  const { type, reducers } = actionModel
   const _reducer = _reducers[type]
   if (_reducer) {
     return _reducer
@@ -12,11 +12,11 @@ export function makeReducer(exportedInfo) {
 
   _actions[type] = createAction(type)
 
-  function luxReducer(state = initialState, action) {
-    if (_isFirstAction && /^@@redux[/]INIT/.test(action.type)) {
-      _isFirstAction = false
-      return initialState
-    }
+  function luxReducer(state, action) {
+    // if (!_returnedInitial && /^@@redux[/]INIT/.test(action.type)) {
+    //   _returnedInitial = true
+    //   return initialState
+    // }
     if (action.type !== type) {
       return
     }
@@ -55,10 +55,14 @@ export function makeRootReducer(inputObject) {
   if (_rootReducer) {
     return _rootReducer
   }
+  const {
+    rootReducer: providedRootReducer,
+    initialState,
+    ...actionModels
+  } = inputObject
 
-  function rootReducer(state, action) {
+  function rootReducer(state = initialState, action) {
     const nextState = Object.assign({}, state)
-    const { rootReducer: providedRootReducer, ...rest } = inputObject
     const stateFromReducer = providedRootReducer
       ? providedRootReducer(nextState, action)
       : nextState
@@ -66,7 +70,7 @@ export function makeRootReducer(inputObject) {
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    for (const info of Object.values(rest)) {
+    for (const info of Object.values(actionModels)) {
       const reducer = makeReducer(info)
       const partialState = reducer(stateFromReducer, luxAction)
       if (!partialState) {
