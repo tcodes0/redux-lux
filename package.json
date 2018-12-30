@@ -1,8 +1,9 @@
 {
   "private": true,
   "workspaces": [
-    "example-todo",
-    "lux-reducers"
+    "lux-reducers",
+    "lux-sagas",
+    "example-todo"
   ],
   "scripts": {
     "precommit": "yarn lint-staged",
