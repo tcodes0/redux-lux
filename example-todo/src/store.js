@@ -24,7 +24,7 @@ const luxReducer = makeLuxReducer({
     set,
   ]
 })
-const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-const store = createStore(luxReducer, comp(applyMiddleware(logger)))
+const enhancedCompose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(luxReducer, enhancedCompose(applyMiddleware(logger)))
 
 export default store
