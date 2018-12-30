@@ -2,7 +2,7 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import { takeEvery, all } from 'redux-saga/effects'
-import { init } from './lux'
+import { init } from 'lux-reducers'
 import logger from 'redux-logger'
 import * as add from './actions/todoAdd'
 import * as toggle from './actions/filterToggle'

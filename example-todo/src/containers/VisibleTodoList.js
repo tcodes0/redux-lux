@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import act from '../lux'
+import act from 'lux-reducers'
 import TodoList from '../components/TodoList'
 
 const getVisibleTodos = (todos, filter) => {
