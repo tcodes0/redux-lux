@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import act from '../lux'
+import act from 'lux-reducers'
 
 let AddTodo = ({ dispatch }) => {
   let input

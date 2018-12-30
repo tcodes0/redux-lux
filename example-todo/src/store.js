@@ -1,8 +1,6 @@
 /* global window */
 import { createStore, applyMiddleware, compose } from 'redux'
-import createSagaMiddleware from 'redux-saga'
-import { takeEvery, all } from 'redux-saga/effects'
-import { init } from './lux'
+import { makeLuxReducer } from 'lux-reducers'
 import logger from 'redux-logger'
 import * as add from './actions/todoAdd'
 import * as toggle from './actions/filterToggle'
@@ -13,13 +11,10 @@ const initialState = {
   visibilityFilter: 'SHOW_ALL',
 }
 
-const sagaMiddleware = createSagaMiddleware()
-const { luxReducer, luxSaga } = init({
+const luxReducer = makeLuxReducer({
   // createAction
   // luxSagaImplementation
   // rootReducer,
-  takeEvery,
-  all,
   preferPayload: true,
   initialState,
   // prettier-ignore
@@ -29,11 +24,7 @@ const { luxReducer, luxSaga } = init({
     set,
   ]
 })
-const comp = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-const store = createStore(
-  luxReducer,
-  comp(applyMiddleware(logger, sagaMiddleware)),
-)
-sagaMiddleware.run(luxSaga)
+const enhancedCompose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(luxReducer, enhancedCompose(applyMiddleware(logger)))
 
 export default store
