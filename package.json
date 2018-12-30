@@ -1,35 +1,4 @@
 {
-  "name": "todos-with-undo",
-  "version": "0.0.1",
   "private": true,
-  "devDependencies": {
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-prettier": "^2.6.0",
-    "react-scripts": "^2.0.2"
-  },
-  "dependencies": {
-    "@babel/node": "^7.2.2",
-    "prop-types": "^15.6.1",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
-    "react-redux": "^5.0.7",
-    "redux": "^3.5.2",
-    "redux-logger": "^3.0.6",
-    "redux-undo": "^0.6.1",
-    "redux-saga": "^0.16.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "test": "react-scripts test --env=node --passWithNoTests"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "workspaces": ["lux-reducers"]
 }
