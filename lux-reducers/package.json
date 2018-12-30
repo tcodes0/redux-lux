@@ -1,0 +1,11 @@
+{
+  "name": "lux-reducers",
+  "version": "0.0.1",
+  "main": "index.js",
+  "private": true,
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {
+    "redux": "^4.0.1"
+  }
+}
