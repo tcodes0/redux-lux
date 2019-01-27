@@ -1,7 +1,15 @@
 // export default _action at end of file
-const _action = {}
-const _type = {}
+let _action = {}
+let _type = {}
 export const type = _type
+
+export function clearAction(type) {
+  _action = {}
+}
+
+export function clearType(type) {
+  _type = {}
+}
 
 export function makeLuxAction(type) {
   return function actionCreator(payload) {
@@ -16,13 +24,8 @@ export function makeLuxAction(type) {
   }
 }
 
-const _reducers = {}
 function makeModelReducer(info) {
   const { type, reducers, preferPayload, createAction } = info
-  const _reducer = _reducers[type]
-  if (_reducer) {
-    return _reducer
-  }
 
   const actionCreator = createAction || makeLuxAction
   _action[type] = actionCreator(type)
@@ -48,15 +51,10 @@ function makeModelReducer(info) {
     return newState
   }
 
-  _reducers[type] = luxReducer
   return luxReducer
 }
 
-let _luxReducer
 export function makeLuxReducer(inputObject) {
-  if (_luxReducer) {
-    return _luxReducer
-  }
   const {
     rootReducer,
     initialState,
@@ -86,8 +84,7 @@ export function makeLuxReducer(inputObject) {
     return stateFromReducer
   }
 
-  _luxReducer = luxReducer
-  return _luxReducer
+  return luxReducer
 }
 
 export default _action

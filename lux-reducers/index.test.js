@@ -1,4 +1,4 @@
-import { makeLuxReducer } from '..'
+import { makeLuxReducer } from '.'
 
 describe('makeLuxReducer test', () => {
   test('models next state', () => {
@@ -24,7 +24,7 @@ describe('makeLuxReducer test', () => {
     const expectedState = { [key]: newValue }
     const resultState = reducer(oldState, action)
     const expectedAction = {
-      payload: {},
+      payload: expect.any(Object),
       type,
     }
 
