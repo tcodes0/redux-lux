@@ -17,7 +17,7 @@ export function makeLuxAction(type) {
 }
 
 const _reducers = {}
-export function makeModelReducer(info) {
+function makeModelReducer(info) {
   const { type, reducers, preferPayload, createAction } = info
   const _reducer = _reducers[type]
   if (_reducer) {
