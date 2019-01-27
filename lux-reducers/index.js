@@ -3,11 +3,11 @@ let _action = {}
 let _type = {}
 export const type = _type
 
-export function clearAction(type) {
+export function clearAction() {
   _action = {}
 }
 
-export function clearType(type) {
+export function clearType() {
   _type = {}
 }
 
