@@ -2,19 +2,19 @@
   "name": "example-todo",
   "version": "0.0.1",
   "private": true,
-  "devDependencies": {
-    "react-scripts": "^2.0.2"
-  },
   "dependencies": {
     "@babel/node": "^7.2.2",
+    "lux-reducers": "^0.0.1",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
     "react-redux": "^5.0.7",
     "redux": "^3.5.2",
-    "redux-logger": "^3.0.6",
-    "redux-undo": "^0.6.1",
-    "lux-reducers": "^0.0.1"
+    "redux-logger": "^3.0.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "react-scripts": "^2.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

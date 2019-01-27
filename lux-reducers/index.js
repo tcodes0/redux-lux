@@ -1,5 +1,5 @@
-const _action = {}
 // export default _action at end of file
+const _action = {}
 const _type = {}
 export const type = _type
 
