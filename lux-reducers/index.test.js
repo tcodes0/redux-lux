@@ -1,7 +1,7 @@
 import { makeLuxReducer } from '.'
 
 describe('makeLuxReducer test', () => {
-  test('models next state', () => {
+  test('models', () => {
     const type = 'foo'
     const key = 'bar'
     const oldValue = 1
