@@ -219,7 +219,6 @@ describe('makeLuxReducer test', () => {
         [key]: modelReducer,
       },
     }
-
     const reducer = makeLuxReducer({
       models: [model, model2, model3],
     })
@@ -228,5 +227,43 @@ describe('makeLuxReducer test', () => {
     expect(act[type]).toEqual(expect.any(Function))
     expect(act[type2]).toEqual(expect.any(Function))
     expect(act[type3]).toEqual(expect.any(Function))
+  })
+
+  test('actions: action.type object has type indexed strings', () => {
+    const type = 'foo'
+    const type2 = 'hoo'
+    const type3 = 'loo'
+    const key = 'bar'
+    const newValue = 2
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const model2 = {
+      type: type2,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const model3 = {
+      type: type3,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      models: [model, model2, model3],
+    })
+    reducer(undefined, { type })
+
+    expect(act.type[type]).toEqual(type)
+    expect(act.type[type2]).toEqual(type2)
+    expect(act.type[type3]).toEqual(type3)
   })
 })

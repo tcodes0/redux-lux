@@ -1,7 +1,7 @@
 // export default _action at end of file
 let _action = {}
 let _type = {}
-export const type = _type
+_action.type = _type
 
 export function makeLuxAction(type) {
   return function actionCreator(payload) {
