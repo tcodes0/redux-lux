@@ -1,3 +1,4 @@
 # Doing
 
-testing new changes on sense
+test rootReducer
+rm preferPayload
