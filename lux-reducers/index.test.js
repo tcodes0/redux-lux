@@ -1,6 +1,6 @@
 import act, { makeLuxReducer } from '.'
 
-describe('makeLuxReducer test', () => {
+describe('index test', () => {
   test('models: action matches type', () => {
     const type = 'foo'
     const key = 'bar'
