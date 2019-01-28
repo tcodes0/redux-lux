@@ -1,4 +1,4 @@
-import act, { makeLuxReducer, clearAction } from '.'
+import act, { makeLuxReducer } from '.'
 
 describe('makeLuxReducer test', () => {
   test('models: action matches type', () => {
@@ -87,6 +87,29 @@ describe('makeLuxReducer test', () => {
     expect(resultState).toEqual(expectedState)
   })
 
+  test('models: reducers can return falsey', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const oldValue = 1
+
+    const modelReducer = jest.fn(() => undefined)
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      models: [model],
+    })
+    const action = { type }
+    const oldState = { [key]: oldValue }
+    const expectedState = oldState
+    const resultState = reducer(oldState, action)
+
+    expect(resultState).toEqual(expectedState)
+  })
+
   test('initialState', () => {
     const type = 'foo'
     const key = 'bar'
@@ -118,8 +141,6 @@ describe('makeLuxReducer test', () => {
   })
 
   test('actions: payload is {}', () => {
-    clearAction()
-
     const type = 'foo'
     const key = 'bar'
     const newValue = 2
@@ -145,8 +166,6 @@ describe('makeLuxReducer test', () => {
   })
 
   test('actions: payload is custom', () => {
-    clearAction()
-
     const type = 'foo'
     const key = 'bar'
     const newValue = 2
@@ -172,7 +191,7 @@ describe('makeLuxReducer test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
 
-  test.only('actions: action object has fns', () => {
+  test('actions: action object has type indexed fns', () => {
     const type = 'foo'
     const type2 = 'hoo'
     const type3 = 'loo'
@@ -201,12 +220,11 @@ describe('makeLuxReducer test', () => {
       },
     }
 
-    // clearAction()
     const reducer = makeLuxReducer({
       models: [model, model2, model3],
     })
     reducer(undefined, { type })
-    console.log('act', act)
+
     expect(act[type]).toEqual(expect.any(Function))
     expect(act[type2]).toEqual(expect.any(Function))
     expect(act[type3]).toEqual(expect.any(Function))

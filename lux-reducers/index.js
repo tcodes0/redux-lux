@@ -3,14 +3,6 @@ let _action = {}
 let _type = {}
 export const type = _type
 
-export function clearAction() {
-  _action = {}
-}
-
-export function clearType() {
-  _type = {}
-}
-
 export function makeLuxAction(type) {
   return function actionCreator(payload) {
     if (!payload) {
@@ -28,7 +20,6 @@ function makeModelReducer(info) {
   const { type, reducers, preferPayload, createAction } = info
 
   const actionCreator = createAction || makeLuxAction
-  console.log('type', type)
   _action[type] = actionCreator(type)
   _type[type] = type
 
@@ -79,7 +70,7 @@ export function makeLuxReducer(inputObject) {
       if (!modelState) {
         continue
       }
-      console.log('new state', modelState)
+      // console.log('new state', modelState)
       Object.assign(stateFromReducer, modelState)
     }
     return stateFromReducer
