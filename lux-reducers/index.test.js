@@ -1,4 +1,4 @@
-import { makeLuxReducer } from '.'
+import act, { makeLuxReducer, clearAction } from '.'
 
 describe('makeLuxReducer test', () => {
   test('models: action matches type', () => {
@@ -85,5 +85,130 @@ describe('makeLuxReducer test', () => {
     const resultState = reducer(oldState, action)
 
     expect(resultState).toEqual(expectedState)
+  })
+
+  test('initialState', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const key2 = 'bag'
+    const oldValue = 1
+    const newValue = 2
+    const action = { type }
+    const initialState = { [key2]: oldValue }
+    const oldState = undefined
+    const newState = { [key]: newValue }
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      initialState,
+      models: [model],
+    })
+    const expectedState = { ...initialState, ...newState }
+    const resultState = reducer(oldState, action)
+
+    expect(resultState).toEqual(expectedState)
+  })
+
+  test('actions: payload is {}', () => {
+    clearAction()
+
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = 2
+    const action = act[type]
+    const oldState = undefined
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      models: [model],
+    })
+    const expectedAction = { type, payload: {} }
+    reducer(oldState, action())
+
+    expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
+  })
+
+  test('actions: payload is custom', () => {
+    clearAction()
+
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = 2
+    const action = act[type]
+    const oldState = undefined
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      models: [model],
+    })
+    const expectedPayload = 44
+    const expectedAction = { type, payload: expectedPayload }
+    reducer(oldState, action(expectedPayload))
+
+    expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
+  })
+
+  test.only('actions: action object has fns', () => {
+    const type = 'foo'
+    const type2 = 'hoo'
+    const type3 = 'loo'
+    const key = 'bar'
+    const newValue = 2
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const model2 = {
+      type: type2,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const model3 = {
+      type: type3,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+
+    // clearAction()
+    const reducer = makeLuxReducer({
+      models: [model, model2, model3],
+    })
+    reducer(undefined, { type })
+    console.log('act', act)
+    expect(act[type]).toEqual(expect.any(Function))
+    expect(act[type2]).toEqual(expect.any(Function))
+    expect(act[type3]).toEqual(expect.any(Function))
   })
 })

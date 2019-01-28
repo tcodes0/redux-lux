@@ -28,6 +28,7 @@ function makeModelReducer(info) {
   const { type, reducers, preferPayload, createAction } = info
 
   const actionCreator = createAction || makeLuxAction
+  console.log('type', type)
   _action[type] = actionCreator(type)
   _type[type] = type
 
