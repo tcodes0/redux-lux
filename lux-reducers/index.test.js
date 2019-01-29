@@ -87,6 +87,53 @@ describe('index test', () => {
     expect(resultState).toEqual(expectedState)
   })
 
+  test('models: model reducers merge together', () => {
+    const type1 = 'foo'
+    const type2 = 'koo'
+    const key1 = 'bar'
+    const key2 = 'bag'
+    const oldValue1 = 1
+    const oldValue2 = 'a'
+    const newValue1 = 2
+    const newValue2 = 'b'
+
+    const modelReducer1 = jest.fn(() => {
+      return newValue1
+    })
+    const modelReducer2 = jest.fn(() => {
+      return newValue2
+    })
+    const model1 = {
+      type: type1,
+      reducers: {
+        [key1]: modelReducer1,
+      },
+    }
+    const model2 = {
+      type: type2,
+      reducers: {
+        [key2]: modelReducer2,
+      },
+    }
+    const reducer = makeLuxReducer({
+      models: [model1, model2],
+    })
+    const action = { type: type1 }
+    const oldState = { [key1]: oldValue1, [key2]: oldValue2 }
+    const reducerState = { [key1]: newValue1 }
+    const expectedState = { ...oldState, ...reducerState }
+    const resultState = reducer(oldState, action)
+
+    expect(resultState).toEqual(expectedState)
+
+    const action2 = { type: type2 }
+    const reducerState2 = { [key2]: newValue2 }
+    const expectedState2 = { ...resultState, ...reducerState2 }
+    const resultState2 = reducer(resultState, action2)
+
+    expect(resultState2).toEqual(expectedState2)
+  })
+
   test('models: reducers can return falsey', () => {
     const type = 'foo'
     const key = 'bar'
@@ -104,10 +151,9 @@ describe('index test', () => {
     })
     const action = { type }
     const oldState = { [key]: oldValue }
-    const expectedState = oldState
     const resultState = reducer(oldState, action)
 
-    expect(resultState).toEqual(expectedState)
+    expect(resultState).toEqual(oldState)
   })
 
   test('initialState: merge with model reducers', () => {
