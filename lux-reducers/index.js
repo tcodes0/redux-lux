@@ -18,8 +18,8 @@ export function makeLuxAction(type) {
 
 function makeModelReducer(info) {
   const { type, reducers, createAction } = info
-
   const actionCreator = createAction || makeLuxAction
+
   _action[type] = actionCreator(type)
   _type[type] = type
 
@@ -43,8 +43,8 @@ function makeModelReducer(info) {
   return luxReducer
 }
 
-export function makeLuxReducer(inputObject) {
-  const { rootReducer, initialState, createAction, models } = inputObject
+export function makeLuxReducer(info) {
+  const { rootReducer, initialState, createAction, models } = info
 
   function luxReducer(state = initialState, action) {
     // avoid bugs by creating new reference
@@ -63,7 +63,6 @@ export function makeLuxReducer(inputObject) {
       if (!modelState) {
         continue
       }
-      // console.log('new state', modelState)
       Object.assign(withInitialState, modelState)
     }
     return withInitialState
