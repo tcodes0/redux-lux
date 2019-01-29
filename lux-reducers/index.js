@@ -17,7 +17,7 @@ export function makeLuxAction(type) {
 }
 
 function makeModelReducer(info) {
-  const { type, reducers, preferPayload, createAction } = info
+  const { type, reducers, createAction } = info
 
   const actionCreator = createAction || makeLuxAction
   _action[type] = actionCreator(type)
@@ -30,10 +30,7 @@ function makeModelReducer(info) {
 
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
-      const result = reducer(
-        state[slice],
-        preferPayload ? action.payload : action,
-      )
+      const result = reducer(state[slice], action)
       if (!result) {
         continue
       }
@@ -47,33 +44,29 @@ function makeModelReducer(info) {
 }
 
 export function makeLuxReducer(inputObject) {
-  const {
-    rootReducer,
-    initialState,
-    preferPayload,
-    createAction,
-    models,
-  } = inputObject
+  const { rootReducer, initialState, createAction, models } = inputObject
 
   function luxReducer(state = initialState, action) {
-    const nextState = Object.assign({}, state)
+    // avoid bugs by creating new reference
+    const nextState = { ...state }
     const stateFromReducer = rootReducer
       ? rootReducer(nextState, action)
       : nextState
+    // pass to modelReducer some keys on initialState
+    const withInitialState = { ...initialState, ...stateFromReducer }
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
     for (const model of models) {
-      const modelInfo = preferPayload ? { ...model, preferPayload } : model
-      const modelReducer = makeModelReducer({ ...modelInfo, createAction })
-      const modelState = modelReducer(stateFromReducer, luxAction)
+      const modelReducer = makeModelReducer({ ...model, createAction })
+      const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue
       }
       // console.log('new state', modelState)
-      Object.assign(stateFromReducer, modelState)
+      Object.assign(withInitialState, modelState)
     }
-    return stateFromReducer
+    return withInitialState
   }
 
   return luxReducer

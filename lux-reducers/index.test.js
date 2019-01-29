@@ -1,7 +1,7 @@
 import act, { makeLuxReducer } from '.'
 
 describe('index test', () => {
-  test('models: action matches type', () => {
+  test('models: model reducer and correct action type', () => {
     const type = 'foo'
     const key = 'bar'
     const oldValue = 1
@@ -32,7 +32,7 @@ describe('index test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldValue, expectedAction)
   })
 
-  test('models: action doesnt match type', () => {
+  test('models: model reducer and not correct action type', () => {
     const type = 'foo'
     const type2 = 'daz'
     const key = 'bar'
@@ -59,7 +59,7 @@ describe('index test', () => {
     expect(modelReducer).not.toHaveBeenCalled()
   })
 
-  test('models: reducers keys merge to state', () => {
+  test('models: model reducers merge with old state', () => {
     const type = 'foo'
     const key = 'bar'
     const key2 = 'bag'
@@ -110,7 +110,7 @@ describe('index test', () => {
     expect(resultState).toEqual(expectedState)
   })
 
-  test('initialState', () => {
+  test('initialState: merge with model reducers', () => {
     const type = 'foo'
     const key = 'bar'
     const key2 = 'bag'
@@ -265,5 +265,117 @@ describe('index test', () => {
     expect(act.type[type]).toEqual(type)
     expect(act.type[type2]).toEqual(type2)
     expect(act.type[type3]).toEqual(type3)
+  })
+
+  test('rootreducer: is called and overlaps with model reducers', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const oldValue = 1
+    const newValue = 2
+    const reducerValue = 3
+    const reducerState = { [key]: reducerValue }
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const rootReducer = jest.fn(() => {
+      return reducerState
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      rootReducer,
+      models: [model],
+    })
+    const action = { type }
+    const oldState = { [key]: oldValue }
+    const expectedState = { [key]: newValue }
+    const resultState = reducer(oldState, action)
+
+    expect(rootReducer).toHaveBeenCalledWith(oldState, action)
+    expect(resultState).toEqual(expectedState)
+  })
+
+  test('rootreducer: merges state with model reducer', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const key2 = 'bat'
+    const oldValue = 1
+    const newValue = 2
+    const reducerValue = 3
+    const reducerState = { [key2]: reducerValue }
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const rootReducer = jest.fn(() => {
+      return reducerState
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const reducer = makeLuxReducer({
+      rootReducer,
+      models: [model],
+    })
+    const action = { type }
+    const oldState = { [key]: oldValue }
+    const expectedState = { [key]: newValue, [key2]: reducerValue }
+    const resultState = reducer(oldState, action)
+
+    expect(resultState).toEqual(expectedState)
+  })
+
+  test('rootreducer: initialState call and overlap with initial and model', () => {
+    const type = 'foo'
+    const modelKey = 'bar'
+    const reducerKey = 'bal'
+    const initialKey = 'doo'
+    const oldValue = 1
+    const newValue = 2
+    const reducerValue = 3
+    const oldReducerValue = 4
+    const initialValue = 'baz'
+    const reducerState = { [reducerKey]: reducerValue }
+
+    const rootReducer = jest.fn(() => {
+      return reducerState
+    })
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [modelKey]: modelReducer,
+      },
+    }
+    const initialState = {
+      [modelKey]: oldValue,
+      [reducerKey]: oldReducerValue,
+      [initialKey]: initialValue,
+    }
+    const modelState = { [modelKey]: newValue }
+    const reducer = makeLuxReducer({
+      rootReducer,
+      initialState,
+      models: [model],
+    })
+    const action = { type }
+    const resultState = reducer(undefined, action)
+
+    expect(rootReducer).toHaveBeenCalledWith(initialState, action)
+    expect(resultState).toEqual({
+      ...initialState,
+      ...reducerState,
+      ...modelState,
+    })
   })
 })
