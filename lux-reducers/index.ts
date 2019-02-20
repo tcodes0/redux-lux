@@ -1,10 +1,25 @@
-// export default _action at end of file
-let _action = {}
-let _type = {}
-_action.type = _type
+export type JSObject<T = any> = { [key: string]: T }
+export type Action<T = any> = JSObject<T> & { type: string }
+export type LuxAction<P = any, T = any> = Action<T> & { payload: P }
+export type Reducer = (state: JSObject, action: Action) => JSObject
+export type LuxReducer = (state: JSObject, action: LuxAction) => JSObject
+export type Defined<T> = T extends undefined ? never : T
+export type IsFunction = (...args: Array<any>) => any
+export type LuxModel = {
+  type: string
+  reducers: JSObject<LuxReducer>
+}
 
-export function makeLuxAction(type) {
-  return function actionCreator(payload) {
+export let types: JSObject<string> = {}
+// default exported
+let actions: JSObject<IsFunction> = {}
+
+export function makeLuxAction(type: string) {
+  function actionCreator(): { type: string; payload: JSObject<undefined> }
+  function actionCreator<P>(
+    payload: Defined<P>,
+  ): { type: string; payload: Defined<P> }
+  function actionCreator(payload?: any) {
     if (!payload) {
       payload = {}
     }
@@ -14,16 +29,22 @@ export function makeLuxAction(type) {
     }
     return result
   }
+
+  return actionCreator
 }
 
-function makeModelReducer(info) {
-  const { type, reducers, createAction } = info
+function makeModelReducer<ActionCreator extends IsFunction>(
+  namedParams: LuxModel & {
+    createAction?: ActionCreator
+  },
+) {
+  const { type, reducers, createAction } = namedParams
   const actionCreator = createAction || makeLuxAction
 
-  _action[type] = actionCreator(type)
-  _type[type] = type
+  actions[type] = actionCreator(type)
+  types[type] = type
 
-  function luxReducer(state, action) {
+  function luxReducer(state: JSObject, action: LuxAction) {
     if (action.type !== type) {
       return
     }
@@ -43,10 +64,15 @@ function makeModelReducer(info) {
   return luxReducer
 }
 
-export function makeLuxReducer(info) {
-  const { rootReducer, initialState, createAction, models } = info
+export function makeLuxReducer<ActionCreator extends IsFunction>(namedParams: {
+  rootReducer: Reducer
+  initialState: JSObject
+  createAction: ActionCreator
+  models: Array<LuxModel>
+}) {
+  const { rootReducer, initialState, createAction, models } = namedParams
 
-  function luxReducer(state = initialState, action) {
+  function luxReducer(state = initialState, action: LuxAction) {
     // avoid bugs by creating new reference
     const nextState = { ...state }
     const stateFromReducer = rootReducer
@@ -58,7 +84,10 @@ export function makeLuxReducer(info) {
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
     for (const model of models) {
-      const modelReducer = makeModelReducer({ ...model, createAction })
+      const modelReducer = makeModelReducer<ActionCreator>({
+        ...model,
+        createAction,
+      })
       const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue
@@ -71,4 +100,4 @@ export function makeLuxReducer(info) {
   return luxReducer
 }
 
-export default _action
+export default actions
