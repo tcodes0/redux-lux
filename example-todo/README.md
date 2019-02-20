@@ -1,3 +1,4 @@
 # Doing
 
-testing new changes on sense
+read zen of python
+fix broken example (reuse from video)

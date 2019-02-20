@@ -24,7 +24,7 @@
   ],
   "rules": {
     "node/no-unsupported-features": "off",
-    "no-unused-vars": "off",
+    "no-unused-vars": "warn",
     "no-console": "off",
     "arrow-body-style": "off",
     "no-restricted-globals": "warn"

@@ -1,7 +1,7 @@
-const _action = {}
 // export default _action at end of file
-const _type = {}
-export const type = _type
+let _action = {}
+let _type = {}
+_action.type = _type
 
 export function makeLuxAction(type) {
   return function actionCreator(payload) {
@@ -16,15 +16,10 @@ export function makeLuxAction(type) {
   }
 }
 
-const _reducers = {}
-export function makeModelReducer(info) {
-  const { type, reducers, preferPayload, createAction } = info
-  const _reducer = _reducers[type]
-  if (_reducer) {
-    return _reducer
-  }
-
+function makeModelReducer(info) {
+  const { type, reducers, createAction } = info
   const actionCreator = createAction || makeLuxAction
+
   _action[type] = actionCreator(type)
   _type[type] = type
 
@@ -35,10 +30,7 @@ export function makeModelReducer(info) {
 
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
-      const result = reducer(
-        state[slice],
-        preferPayload ? action.payload : action,
-      )
+      const result = reducer(state[slice], action)
       if (!result) {
         continue
       }
@@ -48,46 +40,35 @@ export function makeModelReducer(info) {
     return newState
   }
 
-  _reducers[type] = luxReducer
   return luxReducer
 }
 
-let _luxReducer
-export function makeLuxReducer(inputObject) {
-  if (_luxReducer) {
-    return _luxReducer
-  }
-  const {
-    rootReducer,
-    initialState,
-    preferPayload,
-    createAction,
-    models,
-  } = inputObject
+export function makeLuxReducer(info) {
+  const { rootReducer, initialState, createAction, models } = info
 
   function luxReducer(state = initialState, action) {
-    const nextState = Object.assign({}, state)
+    // avoid bugs by creating new reference
+    const nextState = { ...state }
     const stateFromReducer = rootReducer
       ? rootReducer(nextState, action)
       : nextState
+    // pass to modelReducer some keys on initialState
+    const withInitialState = { ...initialState, ...stateFromReducer }
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
     for (const model of models) {
-      const modelInfo = preferPayload ? { ...model, preferPayload } : model
-      const modelReducer = makeModelReducer({ ...modelInfo, createAction })
-      const modelState = modelReducer(stateFromReducer, luxAction)
+      const modelReducer = makeModelReducer({ ...model, createAction })
+      const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue
       }
-      console.log('new state', modelState)
-      Object.assign(stateFromReducer, modelState)
+      Object.assign(withInitialState, modelState)
     }
-    return stateFromReducer
+    return withInitialState
   }
 
-  _luxReducer = luxReducer
-  return _luxReducer
+  return luxReducer
 }
 
 export default _action
