@@ -11,6 +11,8 @@
     "test": "yarn test:reducers",
     "clean:reducers": "yarn workspace lux-reducers clean",
     "build:reducers": "yarn workspace lux-reducers build",
+    "build": "yarn build:reducers",
+    "sync": "\\cp -f ./lux-reducers/dist/* ../devhub/node_modules/lux-reducers/",
     "start": "yarn workspace example-todo start"
   },
   "devDependencies": {

@@ -65,9 +65,9 @@ function makeModelReducer<ActionCreator extends IsFunction>(
 }
 
 export function makeLuxReducer<ActionCreator extends IsFunction>(namedParams: {
-  rootReducer: Reducer
-  initialState: JSObject
-  createAction: ActionCreator
+  rootReducer?: Reducer
+  initialState?: JSObject
+  createAction?: ActionCreator
   models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
