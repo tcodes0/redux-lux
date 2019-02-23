@@ -1,4 +1,6 @@
-import act, { makeLuxReducer } from '.'
+const lux = require('.')
+const act = lux.default
+const { makeLuxReducer, types } = lux
 
 describe('index test', () => {
   test('models: model reducer and correct action type', () => {
@@ -275,7 +277,7 @@ describe('index test', () => {
     expect(act[type3]).toEqual(expect.any(Function))
   })
 
-  test('actions: action.type object has type indexed strings', () => {
+  test('actions: types export has type indexed strings', () => {
     const type = 'foo'
     const type2 = 'hoo'
     const type3 = 'loo'
@@ -308,9 +310,9 @@ describe('index test', () => {
     })
     reducer(undefined, { type })
 
-    expect(act.type[type]).toEqual(type)
-    expect(act.type[type2]).toEqual(type2)
-    expect(act.type[type3]).toEqual(type3)
+    expect(types[type]).toEqual(type)
+    expect(types[type2]).toEqual(type2)
+    expect(types[type3]).toEqual(type3)
   })
 
   test('rootreducer: is called and overlaps with model reducers', () => {
