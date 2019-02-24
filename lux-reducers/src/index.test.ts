@@ -1,13 +1,11 @@
-const lux = require('.')
-const act = lux.default
-const { makeLuxReducer, types } = lux
+import act, { makeLuxReducer, types } from '.'
 
 describe('index test', () => {
   test('models: model reducer and correct action type', () => {
     const type = 'foo'
     const key = 'bar'
-    const oldValue = 1
-    const newValue = 2
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
 
     const modelReducer = jest.fn(() => {
       return newValue
@@ -21,7 +19,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue }
     const resultState = reducer(oldState, action)
@@ -38,8 +36,8 @@ describe('index test', () => {
     const type = 'foo'
     const type2 = 'daz'
     const key = 'bar'
-    const oldValue = 1
-    const newValue = 2
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
 
     const modelReducer = jest.fn(() => {
       return newValue
@@ -53,7 +51,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const resultState = reducer(oldState, action)
 
@@ -65,8 +63,8 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const key2 = 'bag'
-    const oldValue = 1
-    const newValue = 2
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
 
     const modelReducer = jest.fn(() => {
       return newValue
@@ -80,7 +78,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const reducerState = { [key2]: newValue }
     const expectedState = { ...oldState, ...reducerState }
@@ -94,10 +92,10 @@ describe('index test', () => {
     const type2 = 'koo'
     const key1 = 'bar'
     const key2 = 'bag'
-    const oldValue1 = 1
-    const oldValue2 = 'a'
-    const newValue1 = 2
-    const newValue2 = 'b'
+    const oldValue1 = { val: 1 }
+    const newValue1 = { val: 2 }
+    const oldValue2 = { val: 'a' }
+    const newValue2 = { val: 'b' }
 
     const modelReducer1 = jest.fn(() => {
       return newValue1
@@ -120,7 +118,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model1, model2],
     })
-    const action = { type: type1 }
+    const action = { type: type1, payload: {} }
     const oldState = { [key1]: oldValue1, [key2]: oldValue2 }
     const reducerState = { [key1]: newValue1 }
     const expectedState = { ...oldState, ...reducerState }
@@ -128,7 +126,7 @@ describe('index test', () => {
 
     expect(resultState).toEqual(expectedState)
 
-    const action2 = { type: type2 }
+    const action2 = { type: type2, payload: {} }
     const reducerState2 = { [key2]: newValue2 }
     const expectedState2 = { ...resultState, ...reducerState2 }
     const resultState2 = reducer(resultState, action2)
