@@ -149,7 +149,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const resultState = reducer(oldState, action)
 
@@ -160,9 +160,9 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const key2 = 'bag'
-    const oldValue = 1
-    const newValue = 2
-    const action = { type }
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
+    const action = { type, payload: {} }
     const initialState = { [key2]: oldValue }
     const oldState = undefined
     const newState = { [key]: newValue }
@@ -189,7 +189,7 @@ describe('index test', () => {
   test('actions: payload is {}', () => {
     const type = 'foo'
     const key = 'bar'
-    const newValue = 2
+    const newValue = { val: 2 }
     const action = act[type]
     const oldState = undefined
 
@@ -214,7 +214,7 @@ describe('index test', () => {
   test('actions: payload is custom', () => {
     const type = 'foo'
     const key = 'bar'
-    const newValue = 2
+    const newValue = { val: 2 }
     const action = act[type]
     const oldState = undefined
 
@@ -242,7 +242,7 @@ describe('index test', () => {
     const type2 = 'hoo'
     const type3 = 'loo'
     const key = 'bar'
-    const newValue = 2
+    const newValue = { val: 2 }
 
     const modelReducer = jest.fn(() => {
       return newValue
@@ -268,7 +268,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model, model2, model3],
     })
-    reducer(undefined, { type })
+    reducer(undefined, { type, payload: {} })
 
     expect(act[type]).toEqual(expect.any(Function))
     expect(act[type2]).toEqual(expect.any(Function))
@@ -280,7 +280,7 @@ describe('index test', () => {
     const type2 = 'hoo'
     const type3 = 'loo'
     const key = 'bar'
-    const newValue = 2
+    const newValue = { val: 2 }
 
     const modelReducer = jest.fn(() => {
       return newValue
@@ -306,7 +306,7 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model, model2, model3],
     })
-    reducer(undefined, { type })
+    reducer(undefined, { type, payload: {} })
 
     expect(types[type]).toEqual(type)
     expect(types[type2]).toEqual(type2)
@@ -317,7 +317,7 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const oldValue = 1
-    const newValue = 2
+    const newValue = { val: 2 }
     const reducerValue = 3
     const reducerState = { [key]: reducerValue }
 
@@ -337,7 +337,7 @@ describe('index test', () => {
       rootReducer,
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue }
     const resultState = reducer(oldState, action)
@@ -350,9 +350,9 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const key2 = 'bat'
-    const oldValue = 1
-    const newValue = 2
-    const reducerValue = 3
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
+    const reducerValue = { val: 3 }
     const reducerState = { [key2]: reducerValue }
 
     const modelReducer = jest.fn(() => {
@@ -371,7 +371,7 @@ describe('index test', () => {
       rootReducer,
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue, [key2]: reducerValue }
     const resultState = reducer(oldState, action)
@@ -384,10 +384,10 @@ describe('index test', () => {
     const modelKey = 'bar'
     const reducerKey = 'bal'
     const initialKey = 'doo'
-    const oldValue = 1
-    const newValue = 2
-    const reducerValue = 3
-    const oldReducerValue = 4
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
+    const reducerValue = { val: 3 }
+    const oldReducerValue = { val: 4 }
     const initialValue = 'baz'
     const reducerState = { [reducerKey]: reducerValue }
 
@@ -414,7 +414,7 @@ describe('index test', () => {
       initialState,
       models: [model],
     })
-    const action = { type }
+    const action = { type, payload: {} }
     const resultState = reducer(undefined, action)
 
     expect(rootReducer).toHaveBeenCalledWith(initialState, action)

@@ -1,8 +1,11 @@
 export type JSObject<T = any> = { [key: string]: T }
 export type Action<T = any> = JSObject<T> & { type: string }
 export type LuxAction<P = any, T = any> = Action<T> & { payload: P }
-export type Reducer = (state: JSObject, action: Action) => JSObject
-export type LuxReducer = (state: JSObject, action: LuxAction) => JSObject
+export type Reducer = (state: JSObject, action: Action) => JSObject | null
+export type LuxReducer = (
+  state: JSObject,
+  action: LuxAction,
+) => JSObject | undefined | null
 export type Defined<T> = T extends undefined ? never : T
 export type IsFunction = (...args: Array<any>) => any
 export type LuxModel = {
