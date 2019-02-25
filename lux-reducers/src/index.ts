@@ -1,21 +1,20 @@
 export type JSObject<T = any> = { [key: string]: T }
-export type Action<T = any> = JSObject<T> & { type: string }
-export type LuxAction<P = any, T = any> = Action<T> & { payload: P }
+export type Action = { [key: string]: any; type: string }
+export type LuxAction<P = any> = Action & { payload: P }
 export type Reducer = (state: JSObject, action: Action) => JSObject | null
 export type LuxReducer = (
   state: JSObject,
   action: LuxAction,
 ) => JSObject | undefined | null
 export type Defined<T> = T extends undefined ? never : T
-export type IsFunction = (...args: Array<any>) => any
+export type AnyFunction = (...args: Array<any>) => any
 export type LuxModel = {
   type: string
   reducers: JSObject<LuxReducer>
 }
 
 export let types: JSObject<string> = {}
-// default exported
-let actions: JSObject<IsFunction> = {}
+let actions: JSObject<AnyFunction> = {}
 
 export function makeLuxAction(type: string) {
   function actionCreator(): { type: string; payload: JSObject<undefined> }
@@ -36,7 +35,7 @@ export function makeLuxAction(type: string) {
   return actionCreator
 }
 
-function makeModelReducer<ActionCreator extends IsFunction>(
+function makeModelReducer<ActionCreator extends AnyFunction>(
   namedParams: LuxModel & {
     createAction?: ActionCreator
   },
@@ -67,7 +66,7 @@ function makeModelReducer<ActionCreator extends IsFunction>(
   return luxReducer
 }
 
-export function makeLuxReducer<ActionCreator extends IsFunction>(namedParams: {
+export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
   createAction?: ActionCreator
