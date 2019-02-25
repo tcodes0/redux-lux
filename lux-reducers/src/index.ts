@@ -65,11 +65,14 @@ function makeModelReducer<ActionCreator extends AnyFunction>(
   return luxReducer
 }
 
-export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
+export function makeLuxReducer<
+  ActionCreator extends AnyFunction,
+  ModelActionCreator extends AnyFunction
+>(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
   createAction?: ActionCreator
-  models: Array<LuxModel<ActionCreator>>
+  models: Array<LuxModel<ModelActionCreator>>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
 
@@ -91,7 +94,7 @@ export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
       actions[type] = actionCreator(type)
       types[type] = type
 
-      const modelReducer = makeModelReducer<ActionCreator>(model)
+      const modelReducer = makeModelReducer<ModelActionCreator>(model)
       const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue

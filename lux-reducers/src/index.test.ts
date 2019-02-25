@@ -35,8 +35,8 @@ describe('index test', () => {
   test('models: create action', () => {
     const type = 'foo'
     const key = 'bar'
-    const modelAction = () => ({ type, other: 33, payload: [] })
-    const genericAction = () => ({ type: 'generic' })
+    const modelAction = (payload: any) => ({ type, other: 33, payload })
+    const genericAction = () => ({ type: 'generic', bla: Boolean })
 
     const createAction = jest.fn(() => {
       return modelAction
@@ -53,6 +53,51 @@ describe('index test', () => {
     }
     const luxReducer = makeLuxReducer({
       models: [model],
+      createAction: createActionGeneric,
+    })
+    luxReducer({}, { type: 'foo', payload: [] })
+
+    expect(createActionGeneric).not.toHaveBeenCalled()
+    expect(createAction).toHaveBeenCalledWith(type)
+    expect(act[type]).toBe(modelAction)
+  })
+
+  test('[types] Models: Create action with multiple models', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const modelAction = (payload: any) => ({ type, other: 33, payload })
+    const modelAction2 = (payload: Array<string>) => ({
+      type,
+      other: 'hey',
+      payload,
+    })
+    const genericAction = () => ({ type: 'generic', bla: Boolean })
+
+    const createAction = jest.fn(() => {
+      return modelAction
+    })
+    const createAction2 = jest.fn(() => {
+      return modelAction2
+    })
+    const createActionGeneric = jest.fn(() => {
+      return genericAction
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: () => ({ val: 1 }),
+      },
+      createAction,
+    }
+    const model2 = {
+      type,
+      reducers: {
+        [key]: () => ({ val: 1 }),
+      },
+      createAction: createAction2,
+    }
+    const luxReducer = makeLuxReducer({
+      models: [model, model2],
       createAction: createActionGeneric,
     })
     luxReducer({}, { type: 'foo', payload: [] })
