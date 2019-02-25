@@ -1,6 +1,10 @@
 export type JSObject<T = any> = { [key: string]: T }
 export type Action = { [key: string]: any; type: string }
-export type LuxAction<P = any> = Action & { payload: P }
+export type LuxAction<P = any> = {
+  [key: string]: any
+  type: string
+  payload: P
+}
 export type Reducer = (state: JSObject, action: Action) => JSObject | null
 export type LuxReducer = (
   state: JSObject,
@@ -8,9 +12,10 @@ export type LuxReducer = (
 ) => JSObject | undefined | null
 export type Defined<T> = T extends undefined ? never : T
 export type AnyFunction = (...args: Array<any>) => any
-export type LuxModel = {
+export type LuxModel<CreateAction extends AnyFunction> = {
   type: string
   reducers: JSObject<LuxReducer>
+  createAction?: CreateAction
 }
 
 export const types: JSObject<string> = {}
@@ -35,7 +40,9 @@ export function makeLuxAction(type: string) {
   return actionCreator
 }
 
-function makeModelReducer(namedParams: LuxModel) {
+function makeModelReducer<ActionCreator extends AnyFunction>(
+  namedParams: LuxModel<ActionCreator>,
+) {
   const { type, reducers } = namedParams
 
   function luxReducer(state: JSObject, action: LuxAction) {
@@ -62,7 +69,7 @@ export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
   createAction?: ActionCreator
-  models: Array<LuxModel>
+  models: Array<LuxModel<ActionCreator>>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
 
@@ -79,12 +86,12 @@ export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
     // defineActionExports(models, createAction || makeLuxAction)
 
     for (const model of models) {
-      const { type } = model
-      const actionCreator = createAction || makeLuxAction
+      const { type, createAction: createActionModel } = model
+      const actionCreator = createActionModel || createAction || makeLuxAction
       actions[type] = actionCreator(type)
       types[type] = type
 
-      const modelReducer = makeModelReducer(model)
+      const modelReducer = makeModelReducer<ActionCreator>(model)
       const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue

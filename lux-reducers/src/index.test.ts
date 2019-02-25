@@ -35,13 +35,14 @@ describe('index test', () => {
   test('models: create action', () => {
     const type = 'foo'
     const key = 'bar'
-    const myAction = { type }
+    const modelAction = () => ({ type, other: 33, payload: [] })
+    const genericAction = () => ({ type: 'generic' })
 
     const createAction = jest.fn(() => {
-      return myAction
+      return modelAction
     })
     const createActionGeneric = jest.fn(() => {
-      return () => ({ type: 'foo' })
+      return genericAction
     })
     const model = {
       type,
@@ -50,15 +51,15 @@ describe('index test', () => {
       },
       createAction,
     }
-    makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
       createAction: createActionGeneric,
     })
+    luxReducer({}, { type: 'foo', payload: [] })
 
     expect(createActionGeneric).not.toHaveBeenCalled()
-    expect(act[type]).not.toBe(createActionGeneric)
-    expect(act[type]).toBe(createAction)
-    expect(act[type]()).toEqual(myAction)
+    expect(createAction).toHaveBeenCalledWith(type)
+    expect(act[type]).toBe(modelAction)
   })
 
   test('models: model reducer and not correct action type', () => {
