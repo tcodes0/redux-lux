@@ -9,9 +9,7 @@
     "clean": "rimraf dist",
     "tscheck": "tsc"
   },
-  "dependencies": {
-    "runtypes": "^3.1.2"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "peerDependencies": {
     "redux": "^4.0.1"

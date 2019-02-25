@@ -1,5 +1,3 @@
-import { Union, Literal, Static } from 'runtypes'
-
 export type JSObject<T = any> = { [key: string]: T }
 export type Action = { [key: string]: any; type: string }
 export type LuxAction<P = any> = Action & { payload: P }

@@ -9372,11 +9372,6 @@ redux@^3.5.2:
     loose-envify "^1.1.0"
     symbol-observable "^1.0.3"
 
-reflect-metadata@^0.1.12:
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
-  integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
-
 regenerate-unicode-properties@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-7.0.0.tgz#107405afcc4a190ec5ed450ecaa00ed0cafa7a4c"
@@ -9722,13 +9717,6 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   integrity sha1-6Eg5bwV9Ij8kOGkkYY4laUFh7Ec=
   dependencies:
     aproba "^1.1.1"
-
-runtypes@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/runtypes/-/runtypes-3.1.2.tgz#81e186500b6882e0d5badeb5c6deef72e3fcc068"
-  integrity sha512-oxAaykMNPeuxBTHFPHb4N/WiOMln/Sg73CRfEywpdO5FQyi+lVvGvehGny/QtP2hHvfm7/4E8KLcchfZBnMK6Q==
-  dependencies:
-    reflect-metadata "^0.1.12"
 
 rxjs@^6.1.0, rxjs@^6.3.3:
   version "6.3.3"
