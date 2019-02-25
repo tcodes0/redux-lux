@@ -32,6 +32,35 @@ describe('index test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldValue, expectedAction)
   })
 
+  test('models: create action', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const myAction = { type }
+
+    const createAction = jest.fn(() => {
+      return myAction
+    })
+    const createActionGeneric = jest.fn(() => {
+      return () => ({ type: 'foo' })
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: () => ({ val: 1 }),
+      },
+      createAction,
+    }
+    makeLuxReducer({
+      models: [model],
+      createAction: createActionGeneric,
+    })
+
+    expect(createActionGeneric).not.toHaveBeenCalled()
+    expect(act[type]).not.toBe(createActionGeneric)
+    expect(act[type]).toBe(createAction)
+    expect(act[type]()).toEqual(myAction)
+  })
+
   test('models: model reducer and not correct action type', () => {
     const type = 'foo'
     const type2 = 'daz'
