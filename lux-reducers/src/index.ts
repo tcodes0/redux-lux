@@ -60,17 +60,6 @@ function makeModelReducer(namedParams: LuxModel) {
   return luxReducer
 }
 
-export function test() {
-  // models: Array<LuxModel>,
-  // actionCreator: ActionCreator | typeof makeLuxAction,
-  const literals = Object.keys(types).map(Literal)
-  // @ts-ignore
-  const typeEnum = Union(...literals)
-  type TypeEnum = { [key: string]: Static<typeof typeEnum> }
-  const result: TypeEnum = {}
-  return result
-}
-
 export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
