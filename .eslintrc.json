@@ -7,7 +7,7 @@
     "jest": true
   },
   "parser": "babel-eslint",
-  "extends": ["eslint:recommended", "prettier", "plugin:prettier/recommended"],
+  "extends": ["eslint:recommended"],
   "settings": {
     "import/resolver": {
       "node": true,

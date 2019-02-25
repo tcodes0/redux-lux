@@ -1,3 +1,5 @@
+import { Union, Literal, Static } from 'runtypes'
+
 export type JSObject<T = any> = { [key: string]: T }
 export type Action = { [key: string]: any; type: string }
 export type LuxAction<P = any> = Action & { payload: P }
@@ -13,8 +15,8 @@ export type LuxModel = {
   reducers: JSObject<LuxReducer>
 }
 
-export let types: JSObject<string> = {}
-let actions: JSObject<AnyFunction> = {}
+export const types: JSObject<string> = {}
+const actions: JSObject<AnyFunction> = {}
 
 export function makeLuxAction(type: string) {
   function actionCreator(): { type: string; payload: JSObject<undefined> }
@@ -35,16 +37,8 @@ export function makeLuxAction(type: string) {
   return actionCreator
 }
 
-function makeModelReducer<ActionCreator extends AnyFunction>(
-  namedParams: LuxModel & {
-    createAction?: ActionCreator
-  },
-) {
-  const { type, reducers, createAction } = namedParams
-  const actionCreator = createAction || makeLuxAction
-
-  actions[type] = actionCreator(type)
-  types[type] = type
+function makeModelReducer(namedParams: LuxModel) {
+  const { type, reducers } = namedParams
 
   function luxReducer(state: JSObject, action: LuxAction) {
     if (action.type !== type) {
@@ -66,6 +60,17 @@ function makeModelReducer<ActionCreator extends AnyFunction>(
   return luxReducer
 }
 
+export function test() {
+  // models: Array<LuxModel>,
+  // actionCreator: ActionCreator | typeof makeLuxAction,
+  const literals = Object.keys(types).map(Literal)
+  // @ts-ignore
+  const typeEnum = Union(...literals)
+  type TypeEnum = { [key: string]: Static<typeof typeEnum> }
+  const result: TypeEnum = {}
+  return result
+}
+
 export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
@@ -84,12 +89,15 @@ export function makeLuxReducer<ActionCreator extends AnyFunction>(namedParams: {
     const withInitialState = { ...initialState, ...stateFromReducer }
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
+    // defineActionExports(models, createAction || makeLuxAction)
 
     for (const model of models) {
-      const modelReducer = makeModelReducer<ActionCreator>({
-        ...model,
-        createAction,
-      })
+      const { type } = model
+      const actionCreator = createAction || makeLuxAction
+      actions[type] = actionCreator(type)
+      types[type] = type
+
+      const modelReducer = makeModelReducer(model)
       const modelState = modelReducer(withInitialState, luxAction)
       if (!modelState) {
         continue
