@@ -1,5 +1,4 @@
 # Doing
 
-read zen of python
-fix broken example (reuse from video)
-ts
+read zen of pythion
+fix type errors - give up on lux action type

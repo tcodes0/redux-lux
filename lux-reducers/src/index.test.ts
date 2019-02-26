@@ -1,4 +1,7 @@
 import act, { makeLuxReducer, types } from '.'
+import { LuxAction } from './types'
+
+const INIT = { type: '@@redux/INIT' } as LuxAction
 
 describe('index test', () => {
   test('models: model reducer and correct action type', () => {
@@ -36,7 +39,7 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const modelAction = (payload: any) => ({ type, other: 33, payload })
-    const genericAction = () => ({ type: 'generic', bla: Boolean })
+    const genericAction = () => ({ type: 'generic', bla: Boolean, payload: {} })
 
     const createAction = jest.fn(() => {
       return modelAction
@@ -62,16 +65,17 @@ describe('index test', () => {
     expect(act[type]).toBe(modelAction)
   })
 
-  test('[types] Models: Create action with multiple models', () => {
+  test('Models: Create action with multiple models', () => {
     const type = 'foo'
+    const type2 = 'boo'
     const key = 'bar'
-    const modelAction = (payload: any) => ({ type, other: 33, payload })
-    const modelAction2 = (payload: Array<string>) => ({
+    const modelAction = (payload: boolean) => ({ type, other: 33, payload })
+    const modelAction2 = (payload: number) => ({
       type,
       other: 'hey',
       payload,
     })
-    const genericAction = () => ({ type: 'generic', bla: Boolean })
+    const genericAction = () => ({ type: 'generic', bla: Boolean, payload: {} })
 
     const createAction = jest.fn(() => {
       return modelAction
@@ -90,7 +94,7 @@ describe('index test', () => {
       createAction,
     }
     const model2 = {
-      type,
+      type: type2,
       reducers: {
         [key]: () => ({ val: 1 }),
       },
@@ -104,7 +108,9 @@ describe('index test', () => {
 
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
+    expect(createAction2).toHaveBeenCalledWith(type2)
     expect(act[type]).toBe(modelAction)
+    expect(act[type2]).toBe(modelAction2)
   })
 
   test('models: model reducer and not correct action type', () => {
@@ -261,7 +267,7 @@ describe('index test', () => {
     expect(resultState).toEqual(expectedState)
   })
 
-  test('actions: payload is {}', () => {
+  test('actions: payload is undefined defaulting to {}', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }
@@ -286,7 +292,7 @@ describe('index test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
 
-  test('actions: payload is custom', () => {
+  test('actions: payload is defined', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }
@@ -305,9 +311,9 @@ describe('index test', () => {
     const reducer = makeLuxReducer({
       models: [model],
     })
-    const expectedPayload = 44
-    const expectedAction = { type, payload: expectedPayload }
-    reducer(oldState, action(expectedPayload))
+    const payload = 44
+    const expectedAction = { type, payload }
+    reducer(oldState, action(payload))
 
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })

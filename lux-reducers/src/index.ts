@@ -1,25 +1,15 @@
-export type JSObject<T = any> = { [key: string]: T }
-export type Action = { [key: string]: any; type: string }
-export type LuxAction<P = any> = {
-  [key: string]: any
-  type: string
-  payload: P
-}
-export type Reducer = (state: JSObject, action: Action) => JSObject | null
-export type LuxReducer = (
-  state: JSObject,
-  action: LuxAction,
-) => JSObject | undefined | null
-export type Defined<T> = T extends undefined ? never : T
-export type AnyFunction = (...args: Array<any>) => any
-export type LuxModel<CreateAction extends AnyFunction> = {
-  type: string
-  reducers: JSObject<LuxReducer>
-  createAction?: CreateAction
-}
+import {
+  JSObject,
+  ActionCreatorFunction,
+  Defined,
+  LuxModel,
+  LuxAction,
+  HigherOrderActionCreatorFunction,
+  Reducer,
+} from './types'
 
 export const types: JSObject<string> = {}
-const actions: JSObject<AnyFunction> = {}
+const actions: JSObject<ActionCreatorFunction> = {}
 
 export function makeLuxAction(type: string) {
   function actionCreator(): { type: string; payload: JSObject<undefined> }
@@ -36,20 +26,16 @@ export function makeLuxAction(type: string) {
     }
     return result
   }
-
   return actionCreator
 }
 
-function makeModelReducer<ActionCreator extends AnyFunction>(
-  namedParams: LuxModel<ActionCreator>,
-) {
+function makeModelReducer(namedParams: LuxModel) {
   const { type, reducers } = namedParams
 
   function luxReducer(state: JSObject, action: LuxAction) {
     if (action.type !== type) {
       return
     }
-
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
       const result = reducer(state[slice], action)
@@ -58,21 +44,18 @@ function makeModelReducer<ActionCreator extends AnyFunction>(
       }
       newState = { ...newState, [slice]: result }
     }
-
     return newState
   }
-
   return luxReducer
 }
 
 export function makeLuxReducer<
-  ActionCreator extends AnyFunction,
-  ModelActionCreator extends AnyFunction
+  ActionCreator extends HigherOrderActionCreatorFunction
 >(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject
   createAction?: ActionCreator
-  models: Array<LuxModel<ModelActionCreator>>
+  models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
 
@@ -82,28 +65,25 @@ export function makeLuxReducer<
     const stateFromReducer = rootReducer
       ? rootReducer(nextState, action)
       : nextState
-    // pass to modelReducer some keys on initialState
+    // pass to modelReducer keys on initialState not changed by the rootReducer
     const withInitialState = { ...initialState, ...stateFromReducer }
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
-    // defineActionExports(models, createAction || makeLuxAction)
 
     for (const model of models) {
       const { type, createAction: createActionModel } = model
       const actionCreator = createActionModel || createAction || makeLuxAction
       actions[type] = actionCreator(type)
       types[type] = type
-
-      const modelReducer = makeModelReducer<ModelActionCreator>(model)
-      const modelState = modelReducer(withInitialState, luxAction)
-      if (!modelState) {
+      const modelReducer = makeModelReducer(model)
+      const modelNextState = modelReducer(withInitialState, luxAction)
+      if (!modelNextState) {
         continue
       }
-      Object.assign(withInitialState, modelState)
+      Object.assign(withInitialState, modelNextState)
     }
     return withInitialState
   }
-
   return luxReducer
 }
 
