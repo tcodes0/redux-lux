@@ -1,4 +1,4 @@
-import act, { makeLuxReducer, types } from '.'
+import makeLuxReducer from '.'
 import { LuxAction } from './types'
 
 const INIT = { type: '@@redux/INIT' } as LuxAction
@@ -19,13 +19,13 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
     const expectedAction = {
       payload: expect.any(Object),
       type,
@@ -54,7 +54,7 @@ describe('index test', () => {
       },
       createAction,
     }
-    const luxReducer = makeLuxReducer({
+    const { luxReducer, actions } = makeLuxReducer({
       models: [model],
       createAction: createActionGeneric,
     })
@@ -62,7 +62,7 @@ describe('index test', () => {
 
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
-    expect(act[type]).toBe(modelAction)
+    expect(actions[type]).toBe(modelAction)
   })
 
   test('Models: Create action with multiple models', () => {
@@ -100,7 +100,7 @@ describe('index test', () => {
       },
       createAction: createAction2,
     }
-    const luxReducer = makeLuxReducer({
+    const { luxReducer, actions } = makeLuxReducer({
       models: [model, model2],
       createAction: createActionGeneric,
     })
@@ -109,8 +109,8 @@ describe('index test', () => {
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
     expect(createAction2).toHaveBeenCalledWith(type2)
-    expect(act[type]).toBe(modelAction)
-    expect(act[type2]).toBe(modelAction2)
+    expect(actions[type]).toBe(modelAction)
+    expect(actions[type2]).toBe(modelAction2)
   })
 
   test('models: model reducer and not correct action type', () => {
@@ -129,12 +129,12 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(oldState)
     expect(modelReducer).not.toHaveBeenCalled()
@@ -156,14 +156,14 @@ describe('index test', () => {
         [key2]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const reducerState = { [key2]: newValue }
     const expectedState = { ...oldState, ...reducerState }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(expectedState)
   })
@@ -196,21 +196,21 @@ describe('index test', () => {
         [key2]: modelReducer2,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       models: [model1, model2],
     })
     const action = { type: type1, payload: {} }
     const oldState = { [key1]: oldValue1, [key2]: oldValue2 }
     const reducerState = { [key1]: newValue1 }
     const expectedState = { ...oldState, ...reducerState }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(expectedState)
 
     const action2 = { type: type2, payload: {} }
     const reducerState2 = { [key2]: newValue2 }
     const expectedState2 = { ...resultState, ...reducerState2 }
-    const resultState2 = reducer(resultState, action2)
+    const resultState2 = luxReducer(resultState, action2)
 
     expect(resultState2).toEqual(expectedState2)
   })
@@ -227,12 +227,12 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(oldState)
   })
@@ -257,12 +257,12 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       initialState,
       models: [model],
     })
     const expectedState = { ...initialState, ...newState }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(expectedState)
   })
@@ -271,7 +271,6 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }
-    const action = act[type]
     const oldState = undefined
 
     const modelReducer = jest.fn(() => {
@@ -283,20 +282,20 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer, actions } = makeLuxReducer({
       models: [model],
     })
+    const action = actions[type]
     const expectedAction = { type, payload: {} }
-    reducer(oldState, action())
+    luxReducer(oldState, action())
 
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
 
-  test('actions: payload is defined', () => {
+  test.only('actions: payload is defined', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }
-    const action = act[type]
     const oldState = undefined
 
     const modelReducer = jest.fn(() => {
@@ -308,12 +307,13 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer, actions } = makeLuxReducer({
       models: [model],
     })
+    const action = actions[type]
     const payload = 44
     const expectedAction = { type, payload }
-    reducer(oldState, action(payload))
+    luxReducer(oldState, action(payload))
 
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
@@ -346,14 +346,14 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer, actions } = makeLuxReducer({
       models: [model, model2, model3],
     })
-    reducer(undefined, { type, payload: {} })
+    luxReducer(undefined, { type, payload: {} })
 
-    expect(act[type]).toEqual(expect.any(Function))
-    expect(act[type2]).toEqual(expect.any(Function))
-    expect(act[type3]).toEqual(expect.any(Function))
+    expect(actions[type]).toEqual(expect.any(Function))
+    expect(actions[type2]).toEqual(expect.any(Function))
+    expect(actions[type3]).toEqual(expect.any(Function))
   })
 
   test('actions: types export has type indexed strings', () => {
@@ -384,10 +384,10 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer, types } = makeLuxReducer({
       models: [model, model2, model3],
     })
-    reducer(undefined, { type, payload: {} })
+    luxReducer(undefined, { type, payload: {} })
 
     expect(types[type]).toEqual(type)
     expect(types[type2]).toEqual(type2)
@@ -414,14 +414,14 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       rootReducer,
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(rootReducer).toHaveBeenCalledWith(oldState, action)
     expect(resultState).toEqual(expectedState)
@@ -448,14 +448,14 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       rootReducer,
       models: [model],
     })
     const action = { type, payload: {} }
     const oldState = { [key]: oldValue }
     const expectedState = { [key]: newValue, [key2]: reducerValue }
-    const resultState = reducer(oldState, action)
+    const resultState = luxReducer(oldState, action)
 
     expect(resultState).toEqual(expectedState)
   })
@@ -490,13 +490,13 @@ describe('index test', () => {
       [initialKey]: initialValue,
     }
     const modelState = { [modelKey]: newValue }
-    const reducer = makeLuxReducer({
+    const { luxReducer } = makeLuxReducer({
       rootReducer,
       initialState,
       models: [model],
     })
     const action = { type, payload: {} }
-    const resultState = reducer(undefined, action)
+    const resultState = luxReducer(undefined, action)
 
     expect(rootReducer).toHaveBeenCalledWith(initialState, action)
     expect(resultState).toEqual({

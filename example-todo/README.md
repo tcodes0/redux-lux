@@ -1,4 +1,4 @@
 # Doing
 
 read zen of pythion
-fix type errors - give up on lux action type
+repeat for loop to make actions defined without calling reducer once

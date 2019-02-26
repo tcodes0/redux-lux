@@ -8,9 +8,6 @@ import {
   Reducer,
 } from './types'
 
-export const types: JSObject<string> = {}
-const actions: JSObject<ActionCreatorFunction> = {}
-
 export function makeLuxAction(type: string) {
   function actionCreator(): { type: string; payload: JSObject<undefined> }
   function actionCreator<P>(
@@ -49,7 +46,7 @@ function makeModelReducer(namedParams: LuxModel) {
   return luxReducer
 }
 
-export function makeLuxReducer<
+export default function makeLuxReducer<
   ActionCreator extends HigherOrderActionCreatorFunction
 >(namedParams: {
   rootReducer?: Reducer
@@ -58,6 +55,8 @@ export function makeLuxReducer<
   models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
+  const types: JSObject<string> = {}
+  const actions: JSObject<ActionCreatorFunction> = {}
 
   function luxReducer(state = initialState, action: LuxAction) {
     // avoid bugs by creating new reference
@@ -84,7 +83,5 @@ export function makeLuxReducer<
     }
     return withInitialState
   }
-  return luxReducer
+  return { luxReducer, types, actions }
 }
-
-export default actions
