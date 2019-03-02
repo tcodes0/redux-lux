@@ -1,7 +1,4 @@
 import makeLuxReducer from '.'
-import { LuxAction } from './types'
-
-const INIT = { type: '@@redux/INIT' } as LuxAction
 
 describe('index test', () => {
   test('models: model reducer and correct action type', () => {
@@ -65,7 +62,7 @@ describe('index test', () => {
     expect(actions[type]).toBe(modelAction)
   })
 
-  test('Models: Create action with multiple models', () => {
+  test('models: Create action with multiple models', () => {
     const type = 'foo'
     const type2 = 'boo'
     const key = 'bar'
@@ -292,7 +289,7 @@ describe('index test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
 
-  test.only('actions: payload is defined', () => {
+  test('actions: payload is defined', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }

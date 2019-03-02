@@ -9,11 +9,13 @@ import {
 } from './types'
 
 export function makeLuxAction(type: string) {
+  // overload with no args
   function actionCreator(): { type: string; payload: JSObject<undefined> }
+  // overload with 1 args, the payload
   function actionCreator<P>(
     payload: Defined<P>,
   ): { type: string; payload: Defined<P> }
-  function actionCreator(payload?: any) {
+  function actionCreator<P = any>(payload?: JSObject<undefined> | Defined<P>) {
     if (!payload) {
       payload = {}
     }
@@ -26,15 +28,17 @@ export function makeLuxAction(type: string) {
   return actionCreator
 }
 
-function makeModelReducer(namedParams: LuxModel) {
+function makeModelLuxReducer(namedParams: LuxModel) {
   const { type, reducers } = namedParams
 
   function luxReducer(state: JSObject, action: LuxAction) {
+    // this model's lux reducer only responds to it's own action type
     if (action.type !== type) {
       return
     }
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
+      // call reducers in model to get their new states
       const result = reducer(state[slice], action)
       if (!result) {
         continue
@@ -58,9 +62,18 @@ export default function makeLuxReducer<
   const types: JSObject<string> = {}
   const actions: JSObject<ActionCreatorFunction> = {}
 
+  // populate actions and types variables
+  for (const model of models) {
+    const { type, createAction: createActionModel } = model
+    const actionCreator = createActionModel || createAction || makeLuxAction
+    actions[type] = actionCreator(type)
+    types[type] = type
+  }
+
   function luxReducer(state = initialState, action: LuxAction) {
     // avoid bugs by creating new reference
     const nextState = { ...state }
+    // call rootReducer provided as argument, if it is defined
     const stateFromReducer = rootReducer
       ? rootReducer(nextState, action)
       : nextState
@@ -69,13 +82,10 @@ export default function makeLuxReducer<
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
+    // iterate models making root reducers and calling them
     for (const model of models) {
-      const { type, createAction: createActionModel } = model
-      const actionCreator = createActionModel || createAction || makeLuxAction
-      actions[type] = actionCreator(type)
-      types[type] = type
-      const modelReducer = makeModelReducer(model)
-      const modelNextState = modelReducer(withInitialState, luxAction)
+      const modelLuxReducer = makeModelLuxReducer(model)
+      const modelNextState = modelLuxReducer(withInitialState, luxAction)
       if (!modelNextState) {
         continue
       }
