@@ -1,14 +1,14 @@
-export type JSObject<T = any> = { [key: string]: T }
+export type JSObject<ValueType = any> = { [key: string]: ValueType }
 
-export type LuxAction<P = any> = {
+export type LuxAction<Payload = any> = {
   [key: string]: any
   type: string
-  payload: P
+  payload: Payload
 }
 
-export type Reducer<P = any> = (
+export type Reducer<Payload = any> = (
   state: JSObject,
-  action: { [key: string]: any; type: string; payload?: P },
+  action: { [key: string]: any; type: string; payload?: Payload },
 ) => JSObject | null
 
 export type LuxReducer = (
@@ -16,16 +16,15 @@ export type LuxReducer = (
   action: LuxAction,
 ) => JSObject | undefined | null
 
-export type Defined<T> = T extends undefined ? never : T
+export type Defined<It> = It extends undefined ? never : It
 
-export type ActionCreatorFunction = (
-  payload?: any,
-  ...args: Array<any>
+export type ActionCreatorFunction<Payload = any> = (
+  payload?: Payload,
 ) => LuxAction
 
-export type HigherOrderActionCreator = (
+export type HigherOrderActionCreator<Payload = any> = (
   ...args: Array<any>
-) => ActionCreatorFunction
+) => ActionCreatorFunction<Payload>
 
 export type LuxModel<
   CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
