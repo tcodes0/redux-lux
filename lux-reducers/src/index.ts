@@ -4,7 +4,7 @@ import {
   Defined,
   LuxModel,
   LuxAction,
-  HigherOrderActionCreatorFunction,
+  HigherOrderActionCreator,
   Reducer,
 } from './types'
 
@@ -51,7 +51,7 @@ function makeModelLuxReducer(namedParams: LuxModel) {
 }
 
 export default function makeLuxReducer<
-  ActionCreator extends HigherOrderActionCreatorFunction
+  ActionCreator extends HigherOrderActionCreator
 >(namedParams: {
   rootReducer?: Reducer
   initialState?: JSObject

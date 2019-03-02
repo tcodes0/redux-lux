@@ -1,4 +1,5 @@
 # Doing
 
 read zen of pythion
-repeat for loop to make actions defined without calling reducer once
+maybe still export actions and types from lib
+payload inference

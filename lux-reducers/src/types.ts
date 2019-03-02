@@ -29,12 +29,12 @@ export type ActionCreatorFunction = (
   ...args: Array<any>
 ) => LuxAction
 
-export type HigherOrderActionCreatorFunction = (
+export type HigherOrderActionCreator = (
   ...args: Array<any>
 ) => ActionCreatorFunction
 
 export type LuxModel<
-  CreateAction extends HigherOrderActionCreatorFunction = HigherOrderActionCreatorFunction
+  CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
 > = {
   type: string
   reducers: JSObject<LuxReducer>
