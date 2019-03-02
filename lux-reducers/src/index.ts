@@ -77,7 +77,10 @@ function makeModelLuxReducer(namedParams: LuxModel) {
   return luxReducer
 }
 
-export default function makeLuxReducer<
+export const types: JSObject<string> = {}
+const actions: JSObject<ActionCreatorFunction> = {}
+
+export function makeLuxReducer<
   ActionCreator extends HigherOrderActionCreator
 >(namedParams: {
   rootReducer?: Reducer
@@ -86,8 +89,6 @@ export default function makeLuxReducer<
   models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
-  const types: JSObject<string> = {}
-  const actions: JSObject<ActionCreatorFunction> = {}
 
   // populate actions and types variables
   for (const model of models) {
@@ -120,5 +121,7 @@ export default function makeLuxReducer<
     }
     return withInitialState
   }
-  return { luxReducer, types, actions }
+  return luxReducer
 }
+
+export default actions

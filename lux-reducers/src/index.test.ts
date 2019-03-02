@@ -1,4 +1,4 @@
-import makeLuxReducer from '.'
+import actions, { makeLuxReducer, types } from '.'
 
 describe('index test', () => {
   test('models: model reducer and correct action type', () => {
@@ -16,7 +16,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
@@ -51,7 +51,7 @@ describe('index test', () => {
       },
       createAction,
     }
-    const { luxReducer, actions } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
       createAction: createActionGeneric,
     })
@@ -97,7 +97,7 @@ describe('index test', () => {
       },
       createAction: createAction2,
     }
-    const { luxReducer, actions } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model, model2],
       createAction: createActionGeneric,
     })
@@ -126,7 +126,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
@@ -153,7 +153,7 @@ describe('index test', () => {
         [key2]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
@@ -193,7 +193,7 @@ describe('index test', () => {
         [key2]: modelReducer2,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model1, model2],
     })
     const action = { type: type1, payload: {} }
@@ -224,7 +224,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = { type, payload: {} }
@@ -254,7 +254,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       initialState,
       models: [model],
     })
@@ -279,7 +279,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer, actions } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = actions[type]
@@ -304,7 +304,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer, actions } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model],
     })
     const action = actions[type]
@@ -343,7 +343,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer, actions } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model, model2, model3],
     })
     luxReducer(undefined, { type, payload: {} })
@@ -381,7 +381,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer, types } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       models: [model, model2, model3],
     })
     luxReducer(undefined, { type, payload: {} })
@@ -411,7 +411,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       rootReducer,
       models: [model],
     })
@@ -445,7 +445,7 @@ describe('index test', () => {
         [key]: modelReducer,
       },
     }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       rootReducer,
       models: [model],
     })
@@ -487,7 +487,7 @@ describe('index test', () => {
       [initialKey]: initialValue,
     }
     const modelState = { [modelKey]: newValue }
-    const { luxReducer } = makeLuxReducer({
+    const luxReducer = makeLuxReducer({
       rootReducer,
       initialState,
       models: [model],
