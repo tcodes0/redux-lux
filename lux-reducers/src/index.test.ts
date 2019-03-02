@@ -59,7 +59,8 @@ describe('index test', () => {
 
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
-    expect(actions[type]).toBe(modelAction)
+    expect(typeof actions[type]).toBe('function')
+    expect(actions[type].name).toBe(modelAction.name)
   })
 
   test('models: Create action with multiple models', () => {
@@ -106,8 +107,10 @@ describe('index test', () => {
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
     expect(createAction2).toHaveBeenCalledWith(type2)
-    expect(actions[type]).toBe(modelAction)
-    expect(actions[type2]).toBe(modelAction2)
+    expect(typeof actions[type]).toBe('function')
+    expect(typeof actions[type2]).toBe('function')
+    expect(actions[type].name).toBe(modelAction.name)
+    expect(actions[type2].name).toBe(modelAction2.name)
   })
 
   test('models: model reducer and not correct action type', () => {
@@ -501,5 +504,31 @@ describe('index test', () => {
       ...reducerState,
       ...modelState,
     })
+  })
+
+  test('runtime: wrong payload throws', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = { val: 2 }
+    const payloadExample = true
+
+    const model = {
+      type,
+      payload: payloadExample,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+    makeLuxReducer({
+      models: [model],
+    })
+    const action = actions[type]
+    const correctPayload = true
+    const correctPayload2 = false
+    const wrongPayload = 34
+
+    expect(() => action(correctPayload)).not.toThrow()
+    expect(() => action(correctPayload2)).not.toThrow()
+    expect(() => action(wrongPayload)).toThrow()
   })
 })

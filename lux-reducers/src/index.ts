@@ -1,3 +1,4 @@
+/* global Proxy */
 export type JSObject<ValueType = any> = { [key: string]: ValueType }
 
 export type LuxAction<Payload = any> = {
@@ -18,18 +19,19 @@ export type LuxReducer = (
 
 export type Defined<It> = It extends undefined ? never : It
 
+export type HigherOrderActionCreator<Payload = any> = (
+  type: string,
+) => ActionCreatorFunction<Payload>
+
 export type ActionCreatorFunction<Payload = any> = (
   payload?: Payload,
 ) => LuxAction
-
-export type HigherOrderActionCreator<Payload = any> = (
-  ...args: Array<any>
-) => ActionCreatorFunction<Payload>
 
 export type LuxModel<
   CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
 > = {
   type: string
+  payload?: any
   reducers: JSObject<LuxReducer>
   createAction?: CreateAction
 }
@@ -91,9 +93,27 @@ export function makeLuxReducer<
 
   // populate actions and types variables
   for (const model of models) {
-    const { type, createAction: createActionModel } = model
+    const { type, createAction: createActionModel, payload } = model
     const actionCreator = createActionModel || createAction || makeLuxAction
-    actions[type] = actionCreator(type)
+    const validator = (arg: any) => {
+      if (typeof payload === 'undefined') {
+        return
+      }
+      if (typeof arg !== typeof payload) {
+        throw 'errr'
+      }
+    }
+    const handler = {
+      apply: function(
+        target: typeof actions[string],
+        thisArg: any,
+        argumentsList: Array<any>,
+      ) {
+        validator(argumentsList[0])
+        return target.call(thisArg, argumentsList[0])
+      },
+    }
+    actions[type] = new Proxy(actionCreator(type), handler)
     types[type] = type
   }
 
