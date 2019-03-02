@@ -1,16 +1,17 @@
 {
   "name": "lux-reducers",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist",
   "private": true,
-  "devDependencies": {
-    "jest": "^24.0.0"
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "tsc --build",
+    "clean": "rimraf dist",
+    "tscheck": "tsc"
   },
   "dependencies": {},
+  "devDependencies": {},
   "peerDependencies": {
     "redux": "^4.0.1"
-  },
-  "scripts": {
-    "test": "jest --coverage"
   }
 }

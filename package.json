@@ -7,21 +7,32 @@
   ],
   "scripts": {
     "precommit": "yarn lint-staged",
-    "test": "yarn workspace lux-reducers test",
+    "test:reducers": "yarn workspace lux-reducers test",
+    "test": "yarn test:reducers",
+    "clean:reducers": "yarn workspace lux-reducers clean",
+    "build:reducers": "yarn workspace lux-reducers build",
+    "build": "yarn build:reducers",
+    "sync": "\\cp -f ./lux-reducers/dist/* ../devhub/node_modules/lux-reducers/",
     "start": "yarn workspace example-todo start"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.3.1",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.6",
+    "@typescript-eslint/eslint-plugin": "^1.4.0",
+    "@typescript-eslint/parser": "^1.4.0",
     "babel-jest": "^24.0.0",
     "eslint": "^5.12.1",
-    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-prettier": "^2.6.0",
     "husky": "^1.3.1",
+    "jest": "^24.1.0",
     "lint-staged": "^8.1.0",
-    "prettier": "^1.15.3"
+    "prettier": "^1.15.3",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.0",
+    "typescript": "^3.3.3"
   },
   "husky": {
     "hooks": {
