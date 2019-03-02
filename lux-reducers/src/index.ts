@@ -1,4 +1,6 @@
 /* global Proxy */
+import { compareNestedTypes } from './utils'
+
 export type JSObject<ValueType = any> = { [key: string]: ValueType }
 
 export type LuxAction<Payload = any> = {
@@ -79,7 +81,8 @@ function makeModelLuxReducer(namedParams: LuxModel) {
 }
 
 export const types: JSObject<string> = {}
-const actions: JSObject<ActionCreatorFunction> = {}
+let actions: JSObject<ActionCreatorFunction> = {}
+let _models: Array<LuxModel>
 
 export function makeLuxReducer<
   ActionCreator extends HigherOrderActionCreator
@@ -90,31 +93,30 @@ export function makeLuxReducer<
   models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
+  // save reference to use later
+  _models = models
 
   // populate actions and types variables
   for (const model of models) {
     const { type, createAction: createActionModel, payload } = model
     const actionCreator = createActionModel || createAction || makeLuxAction
-    const validator = (arg: any) => {
-      if (typeof payload === 'undefined') {
-        return
-      }
-      if (typeof arg !== typeof payload) {
-        throw 'errr'
-      }
-    }
-    const handler = {
-      apply: function(
+    types[type] = type
+    // runtime type safety of action payloads
+
+    actions[type] = new Proxy(actionCreator(type), {
+      apply: (
         target: typeof actions[string],
         thisArg: any,
-        argumentsList: Array<any>,
-      ) {
-        validator(argumentsList[0])
-        return target.call(thisArg, argumentsList[0])
+        args: Array<any>,
+      ) => {
+        if (payload !== undefined && !compareNestedTypes(payload, args[0])) {
+          throw `[Lux-reducers]: Payload type error. Action \`${type}\` expected \`${typeof payload}\` payload, but got \`${
+            typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
+          }\``
+        }
+        return target.call(thisArg, args[0])
       },
-    }
-    actions[type] = new Proxy(actionCreator(type), handler)
-    types[type] = type
+    })
   }
 
   function luxReducer(state = initialState, action: LuxAction) {
@@ -143,4 +145,16 @@ export function makeLuxReducer<
   return luxReducer
 }
 
-export default actions
+// runtime type safety of action types
+export default new Proxy(actions, {
+  get: (target: JSObject, prop: string) => {
+    if (target[prop] === undefined) {
+      throw `[Lux-reducers]: Unknown action type. Type \`${prop}\` is not defined in any model. Valid actions:
+        ${_models
+          .map(m => m.type)
+          .join(',\n        ')
+          .toString()}`
+    }
+    return target[prop]
+  },
+})
