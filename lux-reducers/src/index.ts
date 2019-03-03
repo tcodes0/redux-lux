@@ -1,35 +1,32 @@
-export type JSObject<ValueType = any> = { [key: string]: ValueType }
+/* global Proxy */
+import { deepCompareTypes } from './utils'
 
+export type JSObject<ValueType = any> = { [key: string]: ValueType }
 export type LuxAction<Payload = any> = {
   [key: string]: any
   type: string
   payload: Payload
 }
-
 export type Reducer<Payload = any> = (
   state: JSObject,
   action: { [key: string]: any; type: string; payload?: Payload },
 ) => JSObject | null
-
 export type LuxReducer = (
   state: JSObject,
   action: LuxAction,
 ) => JSObject | undefined | null
-
 export type Defined<It> = It extends undefined ? never : It
-
+export type HigherOrderActionCreator<Payload = any> = (
+  type: string,
+) => ActionCreatorFunction<Payload>
 export type ActionCreatorFunction<Payload = any> = (
   payload?: Payload,
 ) => LuxAction
-
-export type HigherOrderActionCreator<Payload = any> = (
-  ...args: Array<any>
-) => ActionCreatorFunction<Payload>
-
 export type LuxModel<
   CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
 > = {
   type: string
+  payload?: any
   reducers: JSObject<LuxReducer>
   createAction?: CreateAction
 }
@@ -77,7 +74,8 @@ function makeModelLuxReducer(namedParams: LuxModel) {
 }
 
 export const types: JSObject<string> = {}
-const actions: JSObject<ActionCreatorFunction> = {}
+let actions: JSObject<ActionCreatorFunction> = {}
+let _models: Array<LuxModel>
 
 export function makeLuxReducer<
   ActionCreator extends HigherOrderActionCreator
@@ -88,13 +86,31 @@ export function makeLuxReducer<
   models: Array<LuxModel>
 }) {
   const { rootReducer, initialState, createAction, models } = namedParams
+  // save reference to use later
+  _models = models
 
   // populate actions and types variables
   for (const model of models) {
-    const { type, createAction: createActionModel } = model
+    const { type, createAction: createActionModel, payload } = model
     const actionCreator = createActionModel || createAction || makeLuxAction
-    actions[type] = actionCreator(type)
     types[type] = type
+    // runtime type safety of action payloads
+    actions[type] = new Proxy(actionCreator(type), {
+      apply: (
+        target: typeof actions[string],
+        thisArg: any,
+        args: Array<any>,
+      ) => {
+        if (payload !== undefined && !deepCompareTypes(payload, args[0])) {
+          throw `[Lux-reducers]: Payload type error. Action \`${type}\` expected payload\n\`${
+            typeof payload === 'object' ? JSON.stringify(payload) : payload
+          }\`\nbut got\n\`${
+            typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
+          }\`\n`
+        }
+        return target.call(thisArg, args[0])
+      },
+    })
   }
 
   function luxReducer(state = initialState, action: LuxAction) {
@@ -109,7 +125,7 @@ export function makeLuxReducer<
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    // iterate models making root reducers and calling them
+    // iterate models making lux reducers and calling them
     for (const model of models) {
       const modelLuxReducer = makeModelLuxReducer(model)
       const modelNextState = modelLuxReducer(withInitialState, luxAction)
@@ -123,4 +139,16 @@ export function makeLuxReducer<
   return luxReducer
 }
 
-export default actions
+// runtime type safety of action types
+export default new Proxy(actions, {
+  get: (target: JSObject, prop: string) => {
+    if (target[prop] === undefined) {
+      throw `[Lux-reducers]: Unknown action type. Type \`${prop}\` is not defined in any model. Valid actions:
+        ${_models
+          .map(m => m.type)
+          .join(',\n        ')
+          .toString()}`
+    }
+    return target[prop]
+  },
+})

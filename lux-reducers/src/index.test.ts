@@ -59,7 +59,8 @@ describe('index test', () => {
 
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
-    expect(actions[type]).toBe(modelAction)
+    expect(typeof actions[type]).toBe('function')
+    expect(actions[type].name).toBe(modelAction.name)
   })
 
   test('models: Create action with multiple models', () => {
@@ -106,8 +107,10 @@ describe('index test', () => {
     expect(createActionGeneric).not.toHaveBeenCalled()
     expect(createAction).toHaveBeenCalledWith(type)
     expect(createAction2).toHaveBeenCalledWith(type2)
-    expect(actions[type]).toBe(modelAction)
-    expect(actions[type2]).toBe(modelAction2)
+    expect(typeof actions[type]).toBe('function')
+    expect(typeof actions[type2]).toBe('function')
+    expect(actions[type].name).toBe(modelAction.name)
+    expect(actions[type2].name).toBe(modelAction2.name)
   })
 
   test('models: model reducer and not correct action type', () => {
@@ -501,5 +504,129 @@ describe('index test', () => {
       ...reducerState,
       ...modelState,
     })
+  })
+
+  test('runtime: wrong payload throws', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = { val: 2 }
+    const payloadExample = true
+
+    const model = {
+      type,
+      payload: payloadExample,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+    makeLuxReducer({
+      models: [model],
+    })
+    const action = actions[type]
+    const correctPayload = true
+    const correctPayload2 = false
+    const wrongPayload = 34
+
+    expect(() => action(correctPayload)).not.toThrow()
+    expect(() => action(correctPayload2)).not.toThrow()
+    expect(() => action(wrongPayload)).toThrow(/lux/i)
+  })
+
+  test('runtime: wrong payload doesnt throw if payload is not defined in model', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = { val: 2 }
+
+    const model = {
+      type,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+    makeLuxReducer({
+      models: [model],
+    })
+    const action = actions[type]
+    const wrongPayload = 34
+
+    expect(() => action(wrongPayload)).not.toThrow()
+  })
+
+  test('runtime: undefined action types throw', () => {
+    const type = 'foo'
+    const type2 = 'bar'
+    const key = 'bar'
+    const newValue = { val: 2 }
+
+    const model = {
+      type,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+
+    const model2 = {
+      type: type2,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+    makeLuxReducer({
+      models: [model, model2],
+    })
+    expect(() => actions[type]).not.toThrow()
+    expect(() => actions[type2]).not.toThrow()
+    expect(() => actions.unknown).toThrow(/lux/i)
+  })
+
+  test('runtime: wrong payload hard cases', () => {
+    const type = 'foo'
+    const key = 'bar'
+    const newValue = { val: 2 }
+    const payloadExample = {
+      id: 'foo',
+      amount: { timestamp: 34343, value: 22223, hard: ['text'] },
+      really: () => {},
+    }
+    const model = {
+      type,
+      payload: payloadExample,
+      reducers: {
+        [key]: () => newValue,
+      },
+    }
+    makeLuxReducer({
+      models: [model],
+    })
+    const action = actions[type]
+    const wrongPayload = {}
+    const wrongPayload2: Array<undefined> = []
+    const wrongPayload3 = { id: 'bar' }
+    const wrongPayload4 = { amount: [], id: 'bar' }
+    const wrongPayload5 = [payloadExample, wrongPayload3]
+    const wrongPayload6 = NaN
+    const wrongPayload7 = null
+    const wrongPayload8 = { bar: null }
+    const wrongPayload9 = {
+      id: 'foo',
+      amount: { timestamp: 34343, value: 22223, hard: [44] },
+      really: () => {},
+    }
+    const wrongPayload10 = [payloadExample, payloadExample]
+    const wrongPayload11 = [payloadExample]
+    const correctPayload = payloadExample
+
+    expect(() => action(wrongPayload)).toThrow(/lux/i)
+    expect(() => action(wrongPayload2)).toThrow(/lux/i)
+    expect(() => action(wrongPayload3)).toThrow(/lux/i)
+    expect(() => action(wrongPayload4)).toThrow(/lux/i)
+    expect(() => action(wrongPayload5)).toThrow(/lux/i)
+    expect(() => action(wrongPayload6)).toThrow(/lux/i)
+    expect(() => action(wrongPayload7)).toThrow(/lux/i)
+    expect(() => action(wrongPayload8)).toThrow(/lux/i)
+    expect(() => action(wrongPayload9)).toThrow(/lux/i)
+    expect(() => action(wrongPayload10)).toThrow(/lux/i)
+    expect(() => action(wrongPayload11)).toThrow(/lux/i)
+    expect(() => action(correctPayload)).not.toThrow()
   })
 })
