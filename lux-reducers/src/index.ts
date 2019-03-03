@@ -2,33 +2,26 @@
 import { deepCompareTypes } from './utils'
 
 export type JSObject<ValueType = any> = { [key: string]: ValueType }
-
 export type LuxAction<Payload = any> = {
   [key: string]: any
   type: string
   payload: Payload
 }
-
 export type Reducer<Payload = any> = (
   state: JSObject,
   action: { [key: string]: any; type: string; payload?: Payload },
 ) => JSObject | null
-
 export type LuxReducer = (
   state: JSObject,
   action: LuxAction,
 ) => JSObject | undefined | null
-
 export type Defined<It> = It extends undefined ? never : It
-
 export type HigherOrderActionCreator<Payload = any> = (
   type: string,
 ) => ActionCreatorFunction<Payload>
-
 export type ActionCreatorFunction<Payload = any> = (
   payload?: Payload,
 ) => LuxAction
-
 export type LuxModel<
   CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
 > = {
@@ -132,7 +125,7 @@ export function makeLuxReducer<
     // redux actions like "@@redux/INIT" don't have payload
     const luxAction = action.payload ? action : { ...action, payload: {} }
 
-    // iterate models making root reducers and calling them
+    // iterate models making lux reducers and calling them
     for (const model of models) {
       const modelLuxReducer = makeModelLuxReducer(model)
       const modelNextState = modelLuxReducer(withInitialState, luxAction)
