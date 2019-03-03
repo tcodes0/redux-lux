@@ -547,12 +547,8 @@ describe('index test', () => {
       models: [model],
     })
     const action = actions[type]
-    const correctPayload = true
-    const correctPayload2 = false
     const wrongPayload = 34
 
-    expect(() => action(correctPayload)).not.toThrow()
-    expect(() => action(correctPayload2)).not.toThrow()
     expect(() => action(wrongPayload)).not.toThrow()
   })
 
@@ -587,11 +583,10 @@ describe('index test', () => {
     const type = 'foo'
     const key = 'bar'
     const newValue = { val: 2 }
-    const really = () => {}
     const payloadExample = {
       id: 'foo',
-      amount: { timestamp: 34343, value: 22223 },
-      really,
+      amount: { timestamp: 34343, value: 22223, hard: ['text'] },
+      really: () => {},
     }
     const model = {
       type,
@@ -612,6 +607,13 @@ describe('index test', () => {
     const wrongPayload6 = NaN
     const wrongPayload7 = null
     const wrongPayload8 = { bar: null }
+    const wrongPayload9 = {
+      id: 'foo',
+      amount: { timestamp: 34343, value: 22223, hard: [44] },
+      really: () => {},
+    }
+    const wrongPayload10 = [payloadExample, payloadExample]
+    const wrongPayload11 = [payloadExample]
     const correctPayload = payloadExample
 
     expect(() => action(wrongPayload)).toThrow(/lux/i)
@@ -619,9 +621,12 @@ describe('index test', () => {
     expect(() => action(wrongPayload3)).toThrow(/lux/i)
     expect(() => action(wrongPayload4)).toThrow(/lux/i)
     expect(() => action(wrongPayload5)).toThrow(/lux/i)
-    expect(() => action(wrongPayload6)).toThrow(/lux/i)
+    expect(() => action(wrongPayload6)).toThrow(/luxsd/i)
     expect(() => action(wrongPayload7)).toThrow(/lux/i)
     expect(() => action(wrongPayload8)).toThrow(/lux/i)
+    expect(() => action(wrongPayload9)).toThrow(/lux/i)
+    expect(() => action(wrongPayload10)).toThrow(/lux/i)
+    expect(() => action(wrongPayload11)).toThrow(/lux/i)
     expect(() => action(correctPayload)).not.toThrow()
   })
 })

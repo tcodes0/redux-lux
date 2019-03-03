@@ -1,5 +1,5 @@
 /* global Proxy */
-import { compareNestedTypes } from './utils'
+import { deepCompareTypes } from './utils'
 
 export type JSObject<ValueType = any> = { [key: string]: ValueType }
 
@@ -102,17 +102,18 @@ export function makeLuxReducer<
     const actionCreator = createActionModel || createAction || makeLuxAction
     types[type] = type
     // runtime type safety of action payloads
-
     actions[type] = new Proxy(actionCreator(type), {
       apply: (
         target: typeof actions[string],
         thisArg: any,
         args: Array<any>,
       ) => {
-        if (payload !== undefined && !compareNestedTypes(payload, args[0])) {
-          throw `[Lux-reducers]: Payload type error. Action \`${type}\` expected \`${typeof payload}\` payload, but got \`${
+        if (payload !== undefined && !deepCompareTypes(payload, args[0])) {
+          throw `[Lux-reducers]: Payload type error. Action \`${type}\` expected payload\n\`${
+            typeof payload === 'object' ? JSON.stringify(payload) : payload
+          }\`\nbut got\n\`${
             typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
-          }\``
+          }\`\n`
         }
         return target.call(thisArg, args[0])
       },
