@@ -1,7 +1,11 @@
 /* global Proxy */
-import { deepCompareTypes } from './utils'
+import { deepCompareTypes, unpackArray } from './utils'
 
 export type JSObject<ValueType = any> = { [key: string]: ValueType }
+export type Action = {
+  [key: string]: any
+  type: string
+}
 export type LuxAction<Payload = any> = {
   [key: string]: any
   type: string
@@ -25,7 +29,7 @@ export type ActionCreatorFunction<Payload = any> = (
 export type LuxModel<
   CreateAction extends HigherOrderActionCreator = HigherOrderActionCreator
 > = {
-  type: string
+  type: string | Array<string>
   payload?: any
   reducers: JSObject<LuxReducer>
   createAction?: CreateAction
@@ -52,13 +56,22 @@ export function makeLuxAction(type: string) {
 }
 
 function makeModelLuxReducer(namedParams: LuxModel) {
-  const { type, reducers } = namedParams
+  const { type: packedType, reducers } = namedParams
 
   function luxReducer(state: JSObject, action: LuxAction) {
-    // this model's lux reducer only responds to it's own action type
-    if (action.type !== type) {
+    // if type is a string we compare to the action
+    if (typeof packedType === 'string' && action.type !== packedType) {
+      // this model's lux reducer only responds to it's own action type
       return
     }
+    // if it's an array we don't want to execute if action.type is not in the array
+    if (
+      Array.isArray(packedType) &&
+      !packedType.some(type => type === action.type)
+    ) {
+      return
+    }
+
     let newState = {}
     for (const [slice, reducer] of Object.entries(reducers)) {
       // call reducers in model to get their new states
@@ -89,31 +102,34 @@ export function makeLuxReducer<
   // save reference to use later
   _models = models
 
-  // populate actions and types variables
+  // populate actions and types exports for each model
   for (const model of models) {
-    const { type, createAction: createActionModel, payload } = model
+    const { type: packedType, createAction: createActionModel, payload } = model
     const actionCreator = createActionModel || createAction || makeLuxAction
-    types[type] = type
-    // runtime type safety of action payloads
-    actions[type] = new Proxy(actionCreator(type), {
-      apply: (
-        target: typeof actions[string],
-        thisArg: any,
-        args: Array<any>,
-      ) => {
-        if (payload !== undefined && !deepCompareTypes(payload, args[0])) {
-          throw `[Lux-reducer]: Payload type error. Action \`${type}\` expected payload\n\`${
-            typeof payload === 'object' ? JSON.stringify(payload) : payload
-          }\`\nbut got\n\`${
-            typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
-          }\`\n`
-        }
-        return target.call(thisArg, args[0])
-      },
-    })
+    // get types as strings from model.type
+    for (const type of unpackArray(packedType)) {
+      types[type] = type
+      // runtime type safety of action payloads
+      actions[type] = new Proxy(actionCreator(type), {
+        apply: (
+          target: typeof actions[string],
+          thisArg: any,
+          args: Array<any>,
+        ) => {
+          if (payload !== undefined && !deepCompareTypes(payload, args[0])) {
+            throw `[Lux-reducer]: Payload type error. Action \`${type}\` expected payload\n\`${
+              typeof payload === 'object' ? JSON.stringify(payload) : payload
+            }\`\nbut got\n\`${
+              typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
+            }\`\n`
+          }
+          return target.call(thisArg, args[0])
+        },
+      })
+    }
   }
 
-  function luxReducer(state = initialState, action: LuxAction) {
+  function luxReducer(state = initialState, action: Action) {
     // avoid bugs by creating new reference
     const nextState = { ...state }
     // call rootReducer provided as argument, if it is defined
@@ -128,7 +144,10 @@ export function makeLuxReducer<
     // iterate models making lux reducers and calling them
     for (const model of models) {
       const modelLuxReducer = makeModelLuxReducer(model)
-      const modelNextState = modelLuxReducer(withInitialState, luxAction)
+      const modelNextState = modelLuxReducer(
+        withInitialState,
+        luxAction as LuxAction,
+      )
       if (!modelNextState) {
         continue
       }

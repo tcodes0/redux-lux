@@ -32,6 +32,47 @@ describe('index test', () => {
     expect(modelReducer).toHaveBeenCalledWith(oldValue, expectedAction)
   })
 
+  test('models: model with type array', () => {
+    const type = 'foo'
+    const type2 = 'baz'
+    const type3 = 'big'
+    const key = 'bar'
+    const oldValue = { val: 1 }
+    const newValue = { val: 2 }
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type: [type, type2],
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const luxReducer = makeLuxReducer({
+      models: [model],
+    })
+    const action = { type, payload: {} }
+    const action2 = { type: type2, payload: {} }
+    const action3 = { type: type3, payload: {} }
+    const oldState = { [key]: oldValue }
+    const expectedState = { [key]: newValue }
+
+    const resultState = luxReducer(oldState, action)
+    expect(resultState).toEqual(expectedState)
+
+    const resultState2 = luxReducer(oldState, action2)
+    expect(resultState2).toEqual(expectedState)
+
+    const resultState3 = luxReducer(oldState, action3)
+    expect(resultState3).toEqual(oldState)
+
+    const actionKeys = Object.keys(actions)
+    const typeKeys = Object.keys(types)
+    expect(actionKeys).toEqual([type, type2])
+    expect(typeKeys).toEqual([type, type2])
+  })
+
   test('models: create action', () => {
     const type = 'foo'
     const key = 'bar'
@@ -314,6 +355,32 @@ describe('index test', () => {
     const payload = 44
     const expectedAction = { type, payload }
     luxReducer(oldState, action(payload))
+
+    expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
+  })
+
+  test('actions: payload is handled on stock actions with no payload', () => {
+    const type = '@@redux/INIT'
+    const key = 'bar'
+    const newValue = { val: 2 }
+    const oldState = undefined
+
+    const modelReducer = jest.fn(() => {
+      return newValue
+    })
+    const model = {
+      type,
+      reducers: {
+        [key]: modelReducer,
+      },
+    }
+    const luxReducer = makeLuxReducer({
+      models: [model],
+    })
+    const action = { type }
+    const expectedAction = { type, payload: {} }
+    // @ts-ignore
+    luxReducer(oldState, action)
 
     expect(modelReducer).toHaveBeenCalledWith(oldState, expectedAction)
   })
