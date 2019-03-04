@@ -1,5 +1,5 @@
 {
-  "name": "lux-reducers",
+  "name": "lux-reducer",
   "version": "0.0.1",
   "main": "dist",
   "private": true,

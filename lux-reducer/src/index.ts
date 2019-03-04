@@ -102,7 +102,7 @@ export function makeLuxReducer<
         args: Array<any>,
       ) => {
         if (payload !== undefined && !deepCompareTypes(payload, args[0])) {
-          throw `[Lux-reducers]: Payload type error. Action \`${type}\` expected payload\n\`${
+          throw `[Lux-reducer]: Payload type error. Action \`${type}\` expected payload\n\`${
             typeof payload === 'object' ? JSON.stringify(payload) : payload
           }\`\nbut got\n\`${
             typeof args[0] === 'object' ? JSON.stringify(args[0]) : args[0]
@@ -143,7 +143,7 @@ export function makeLuxReducer<
 export default new Proxy(actions, {
   get: (target: JSObject, prop: string) => {
     if (target[prop] === undefined) {
-      throw `[Lux-reducers]: Unknown action type. Type \`${prop}\` is not defined in any model. Valid actions:
+      throw `[Lux-reducer]: Unknown action type. Type \`${prop}\` is not defined in any model. Valid actions:
         ${_models
           .map(m => m.type)
           .join(',\n        ')

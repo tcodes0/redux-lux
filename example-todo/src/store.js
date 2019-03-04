@@ -1,6 +1,6 @@
 /* global window */
 import { createStore, applyMiddleware, compose } from 'redux'
-import { makeLuxReducer } from 'lux-reducers'
+import { makeLuxReducer } from 'lux-reducer'
 import logger from 'redux-logger'
 import * as add from './actions/todoAdd'
 import * as toggle from './actions/filterToggle'

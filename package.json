@@ -1,18 +1,18 @@
 {
   "private": true,
   "workspaces": [
-    "lux-reducers",
-    "lux-sagas",
+    "lux-reducer",
+    "lux-saga",
     "example-todo"
   ],
   "scripts": {
     "precommit": "yarn lint-staged",
-    "test:reducers": "yarn workspace lux-reducers test",
+    "test:reducers": "yarn workspace lux-reducer test",
     "test": "yarn test:reducers",
-    "clean:reducers": "yarn workspace lux-reducers clean",
-    "build:reducers": "yarn workspace lux-reducers build",
+    "clean:reducers": "yarn workspace lux-reducer clean",
+    "build:reducers": "yarn workspace lux-reducer build",
     "build": "yarn build:reducers",
-    "sync": "\\cp -f ./lux-reducers/dist/* ../devhub/node_modules/lux-reducers/",
+    "sync": "\\cp -f ./lux-reducer/dist/* ../devhub/node_modules/lux-reducer/",
     "start": "yarn workspace example-todo start"
   },
   "devDependencies": {
